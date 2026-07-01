@@ -1,12 +1,12 @@
 """Filter extensions for core Nautobot models."""
 
-from nautobot.apps.filters import NaturalKeyOrPKMultipleChoiceFilter, PluginFilterExtension
+from nautobot.apps.filters import FilterExtension, NaturalKeyOrPKMultipleChoiceFilter
 from nautobot.apps.forms import DynamicModelMultipleChoiceField
 
 from nautobot_function_codes import models
 
 
-class DeviceFilterExtension(PluginFilterExtension):
+class DeviceFilterExtension(FilterExtension):
     """Extend Device filtering with Function Code."""
 
     model = "dcim.device"
