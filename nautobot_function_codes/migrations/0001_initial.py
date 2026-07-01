@@ -3,9 +3,8 @@
 import uuid
 
 import django.db.models.deletion
-from django.db import migrations, models
-
 import nautobot.core.models.fields
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

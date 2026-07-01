@@ -9,6 +9,7 @@ class FunctionCodeDetailPanel(Panel):
     """Detail panel showing the assigned Function Code."""
 
     def __init__(self, **kwargs):
+        """Initialize the Function Code detail panel."""
         super().__init__(
             body_content_template_path="nautobot_function_codes/inc/function_code_panel.html",
             label="Function Code",
@@ -18,6 +19,7 @@ class FunctionCodeDetailPanel(Panel):
         )
 
     def get_extra_context(self, context):
+        """Return Function Code context for the panel template."""
         return {"function_code": get_device_function_code(context["object"])}
 
 

@@ -1,7 +1,6 @@
 """Forms for nautobot_function_codes."""
 
 from django import forms
-
 from nautobot.apps.forms import (
     DynamicModelChoiceField,
     NautobotBulkEditForm,
@@ -19,6 +18,8 @@ class FunctionCodeForm(NautobotModelForm):
     slug = SlugField()
 
     class Meta:
+        """Meta attributes."""
+
         model = models.FunctionCode
         fields = [
             "name",
@@ -41,6 +42,8 @@ class FunctionCodeBulkEditForm(NautobotBulkEditForm):
     is_active = forms.NullBooleanField(required=False)
 
     class Meta:
+        """Meta attributes."""
+
         nullable_fields = [
             "description",
             "color",
@@ -74,6 +77,7 @@ class DeviceFunctionCodeFormMixin(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        """Initialize the form and pre-populate the current Function Code assignment."""
         super().__init__(*args, **kwargs)
         if getattr(self.instance, "present_in_database", False):
             assignment = getattr(self.instance, "function_code_assignment", None)

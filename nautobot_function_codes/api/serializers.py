@@ -1,8 +1,7 @@
 """API serializers for nautobot_function_codes."""
 
-from rest_framework import serializers
-
 from nautobot.apps.api import NautobotModelSerializer
+from rest_framework import serializers
 
 from nautobot_function_codes import models
 
@@ -13,6 +12,8 @@ class FunctionCodeSerializer(NautobotModelSerializer):
     device_count = serializers.IntegerField(read_only=True)
 
     class Meta:
+        """Meta attributes."""
+
         model = models.FunctionCode
         fields = [
             "id",
@@ -35,6 +36,8 @@ class DeviceFunctionCodeAssignmentSerializer(NautobotModelSerializer):
     """DeviceFunctionCodeAssignment REST API serializer."""
 
     class Meta:
+        """Meta attributes."""
+
         model = models.DeviceFunctionCodeAssignment
         fields = [
             "id",

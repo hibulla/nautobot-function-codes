@@ -1,7 +1,6 @@
 """Views for FunctionCode."""
 
 from django.db.models import Count
-
 from nautobot.apps.ui import ObjectDetailContent, ObjectFieldsPanel, SectionChoices
 from nautobot.apps.views import NautobotUIViewSet
 

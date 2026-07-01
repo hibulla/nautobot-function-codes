@@ -1,7 +1,6 @@
 """API views for nautobot_function_codes."""
 
 from django.db.models import Count
-
 from nautobot.apps.api import NautobotModelViewSet
 
 from nautobot_function_codes import filters, models

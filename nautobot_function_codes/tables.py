@@ -3,7 +3,6 @@
 import django_tables2 as tables
 from django.urls import reverse
 from django.utils.html import format_html
-
 from nautobot.apps.tables import BaseTable, BooleanColumn, ButtonsColumn, ColorColumn, LinkedCountColumn, ToggleColumn
 
 from nautobot_function_codes import models
@@ -25,6 +24,8 @@ class FunctionCodeTable(BaseTable):
     actions = ButtonsColumn(models.FunctionCode, pk_field="pk")
 
     class Meta(BaseTable.Meta):
+        """Meta attributes."""
+
         model = models.FunctionCode
         fields = (
             "pk",
@@ -51,6 +52,7 @@ class DeviceFunctionCodeColumn(tables.Column):
     """Custom column rendering Function Code on Device list views."""
 
     def render(self, record, value):
+        """Render the Function Code badge and link for a device row."""
         function_code = value
         if function_code is None:
             return format_html('<span class="text-muted">&mdash;</span>')

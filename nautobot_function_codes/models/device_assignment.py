@@ -1,7 +1,6 @@
 """Device to FunctionCode assignment model."""
 
 from django.db import models
-
 from nautobot.apps.models import BaseModel
 
 
@@ -24,10 +23,13 @@ class DeviceFunctionCodeAssignment(BaseModel):
     )
 
     class Meta:
+        """Meta attributes."""
+
         verbose_name = "Device Function Code Assignment"
         verbose_name_plural = "Device Function Code Assignments"
 
     def __str__(self):
+        """Stringify instance."""
         if self.function_code:
             return f"{self.device}: {self.function_code}"
         return f"{self.device}: (none)"

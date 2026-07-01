@@ -1,7 +1,6 @@
 """Filtering for nautobot_function_codes."""
 
 import django_filters
-
 from nautobot.apps.filters import (
     NameSearchFilterSet,
     NaturalKeyOrPKMultipleChoiceFilter,
@@ -27,6 +26,8 @@ class FunctionCodeFilterSet(NameSearchFilterSet, NautobotFilterSet):
     slug = django_filters.CharFilter()
 
     class Meta:
+        """Meta attributes."""
+
         model = models.FunctionCode
         fields = ["id", "name", "slug", "description", "color", "is_active", "created", "last_updated"]
 
@@ -42,5 +43,7 @@ class DeviceFunctionCodeAssignmentFilterSet(NautobotFilterSet):
     )
 
     class Meta:
+        """Meta attributes."""
+
         model = models.DeviceFunctionCodeAssignment
         fields = ["id", "device_id", "function_code", "created", "last_updated"]

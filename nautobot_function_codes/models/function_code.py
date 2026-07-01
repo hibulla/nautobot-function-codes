@@ -1,7 +1,6 @@
 """FunctionCode model."""
 
 from django.db import models
-
 from nautobot.apps.constants import CHARFIELD_MAX_LENGTH
 from nautobot.apps.models import OrganizationalModel, extras_features
 from nautobot.core.models.fields import ColorField
@@ -28,11 +27,14 @@ class FunctionCode(OrganizationalModel):
     natural_key_field_names = ["slug"]
 
     class Meta:
+        """Meta attributes."""
+
         ordering = ["name"]
         verbose_name = "Function Code"
         verbose_name_plural = "Function Codes"
 
     def __str__(self):
+        """Stringify instance."""
         return self.name
 
     def get_absolute_url(self):

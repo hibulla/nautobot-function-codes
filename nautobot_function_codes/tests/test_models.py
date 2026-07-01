@@ -2,7 +2,6 @@
 
 from django.db.models.deletion import ProtectedError
 from django.db.utils import IntegrityError
-
 from nautobot.apps.testing import ModelTestCases
 
 from nautobot_function_codes import models

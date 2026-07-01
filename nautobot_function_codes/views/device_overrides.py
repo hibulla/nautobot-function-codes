@@ -1,8 +1,8 @@
 """Device view overrides for Function Code integration."""
 
 from django.db import transaction
-
 from nautobot.dcim.views import DeviceUIViewSet
+
 from nautobot_function_codes.forms.device import DeviceBulkEditFormWithFunctionCode, DeviceFormWithFunctionCode
 from nautobot_function_codes.utils import set_device_function_code
 
@@ -14,6 +14,7 @@ class DeviceUIViewSetWithFunctionCode(DeviceUIViewSet):
     bulk_update_form_class = DeviceBulkEditFormWithFunctionCode
 
     def get_queryset(self):
+        """Prefetch Function Code assignment data for list and detail views."""
         queryset = super().get_queryset()
         if self.action in ("retrieve", "list"):
             queryset = queryset.select_related("function_code_assignment__function_code")
