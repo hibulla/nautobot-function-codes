@@ -56,14 +56,38 @@ class DeviceFunctionCodeAssignmentAPIViewTest(APIViewTestCases.APIViewTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.function_code = fixtures.create_functioncode_with(name="COR", slug="cor")
-        cls.device = create_test_device(name="api-device-1")
+        cls.function_codes = [
+            fixtures.create_functioncode_with(name="COR", slug="cor"),
+            fixtures.create_functioncode_with(name="DIS", slug="dis-api"),
+            fixtures.create_functioncode_with(name="ACC", slug="acc-api"),
+        ]
+        cls.devices = [
+            create_test_device(name="api-device-1"),
+            create_test_device(name="api-device-2"),
+            create_test_device(name="api-device-3"),
+        ]
+        for device, function_code in zip(cls.devices, cls.function_codes, strict=True):
+            models.DeviceFunctionCodeAssignment.objects.create(device=device, function_code=function_code)
+
+        cls.create_devices = [
+            create_test_device(name="api-device-create-1"),
+            create_test_device(name="api-device-create-2"),
+            create_test_device(name="api-device-create-3"),
+        ]
         cls.create_data = [
             {
-                "device": cls.device.pk,
-                "function_code": cls.function_code.pk,
+                "device": cls.create_devices[0].pk,
+                "function_code": cls.function_codes[0].pk,
+            },
+            {
+                "device": cls.create_devices[1].pk,
+                "function_code": cls.function_codes[1].pk,
+            },
+            {
+                "device": cls.create_devices[2].pk,
+                "function_code": cls.function_codes[2].pk,
             },
         ]
         cls.update_data = {
-            "function_code": cls.function_code.pk,
+            "function_code": cls.function_codes[0].pk,
         }

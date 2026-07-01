@@ -2,7 +2,7 @@
 
 from django.db.models.deletion import ProtectedError
 from django.db.utils import IntegrityError
-from nautobot.apps.testing import ModelTestCases
+from nautobot.apps.testing import ModelTestCases, TestCase
 
 from nautobot_function_codes import models
 from nautobot_function_codes.tests import fixtures
@@ -39,7 +39,7 @@ class TestFunctionCode(ModelTestCases.BaseModelTestCase):
         self.assertFalse(functioncode.is_active)
 
 
-class TestDeviceFunctionCodeAssignment(ModelTestCases.BaseModelTestCase):
+class TestDeviceFunctionCodeAssignment(TestCase):
     """Test DeviceFunctionCodeAssignment model."""
 
     model = models.DeviceFunctionCodeAssignment

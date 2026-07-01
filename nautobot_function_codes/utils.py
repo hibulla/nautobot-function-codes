@@ -5,9 +5,10 @@ from nautobot_function_codes.models import DeviceFunctionCodeAssignment, Functio
 
 def get_device_function_code(device):
     """Return the FunctionCode assigned to a device, if any."""
-    try:
-        assignment = device.function_code_assignment
-    except DeviceFunctionCodeAssignment.DoesNotExist:
+    assignment = (
+        DeviceFunctionCodeAssignment.objects.select_related("function_code").filter(device_id=device.pk).first()
+    )
+    if assignment is None:
         return None
     return assignment.function_code
 
