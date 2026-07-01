@@ -58,7 +58,7 @@ class DeviceFunctionCodeColumn(tables.Column):
             return format_html('<span class="text-muted">&mdash;</span>')
         url = reverse("plugins:nautobot_function_codes:functioncode", kwargs={"pk": function_code.pk})
         label = format_html(
-            '<span class="badge" style="background-color: {};">&nbsp;</span> {}',
+            '<span class="badge" style="background-color: #{};">&nbsp;</span> {}',
             function_code.color,
             function_code.name,
         )

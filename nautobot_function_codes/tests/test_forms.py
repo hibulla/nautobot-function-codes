@@ -14,7 +14,7 @@ class FunctionCodeFormTest(TestCase):
                 "name": "Development",
                 "slug": "development",
                 "description": "Development Testing",
-                "color": "#9e9e9e",
+                "color": "9e9e9e",
                 "is_active": True,
             }
         )

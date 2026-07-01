@@ -27,10 +27,10 @@ class Command(BaseCommand):
     def _generate_static_data(self, db):
         """Generate static FunctionCode records for manual testing."""
         defaults = [
-            {"name": "WAN", "slug": "wan", "description": "Wide area network device", "color": "#2196f3"},
-            {"name": "ACC", "slug": "acc", "description": "Access layer device", "color": "#4caf50"},
-            {"name": "COR", "slug": "cor", "description": "Core layer device", "color": "#f44336"},
-            {"name": "DIS", "slug": "dis", "description": "Distribution layer device", "color": "#ff9800"},
+            {"name": "WAN", "slug": "wan", "description": "Wide area network device", "color": "2196f3"},
+            {"name": "ACC", "slug": "acc", "description": "Access layer device", "color": "4caf50"},
+            {"name": "COR", "slug": "cor", "description": "Core layer device", "color": "f44336"},
+            {"name": "DIS", "slug": "dis", "description": "Distribution layer device", "color": "ff9800"},
         ]
         for entry in defaults:
             FunctionCode.objects.using(db).get_or_create(slug=entry["slug"], defaults=entry)

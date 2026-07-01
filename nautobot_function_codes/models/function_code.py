@@ -4,6 +4,7 @@ from django.db import models
 from django.urls import reverse
 from nautobot.apps.constants import CHARFIELD_MAX_LENGTH
 from nautobot.apps.models import OrganizationalModel, extras_features
+from nautobot.core.choices import ColorChoices
 from nautobot.core.models.fields import ColorField
 
 
@@ -22,7 +23,7 @@ class FunctionCode(OrganizationalModel):
     name = models.CharField(max_length=CHARFIELD_MAX_LENGTH, unique=True)
     slug = models.SlugField(max_length=CHARFIELD_MAX_LENGTH, unique=True)
     description = models.TextField(blank=True)
-    color = ColorField(default="#9e9e9e", blank=True)
+    color = ColorField(default=ColorChoices.COLOR_GREY, blank=True)
     is_active = models.BooleanField(default=True)
 
     natural_key_field_names = ["slug"]

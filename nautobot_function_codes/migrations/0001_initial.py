@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ("description", models.TextField(blank=True)),
                 (
                     "color",
-                    nautobot.core.models.fields.ColorField(blank=True, default="#9e9e9e", max_length=6),
+                    nautobot.core.models.fields.ColorField(blank=True, default="9e9e9e", max_length=6),
                 ),
                 ("is_active", models.BooleanField(default=True)),
             ],

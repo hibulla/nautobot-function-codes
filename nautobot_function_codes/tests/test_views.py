@@ -15,14 +15,14 @@ class FunctionCodeViewTest(ViewTestCases.OrganizationalObjectViewTestCase):
         "name": "Test 1",
         "slug": "test-1",
         "description": "Initial model",
-        "color": "#9e9e9e",
+        "color": "9e9e9e",
         "is_active": True,
     }
     update_data = {
         "name": "Test 2",
         "slug": "test-2",
         "description": "Updated model",
-        "color": "#ff0000",
+        "color": "ff0000",
         "is_active": False,
     }
 
