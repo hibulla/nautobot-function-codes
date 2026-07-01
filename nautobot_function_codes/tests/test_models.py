@@ -10,7 +10,7 @@ from nautobot_function_codes.tests.utils import create_test_device
 from nautobot_function_codes.utils import get_device_function_code, set_device_function_code
 
 
-class TestFunctionCode(ModelTestCases.OrganizationalModelTestCase):
+class TestFunctionCode(ModelTestCases.BaseModelTestCase):
     """Test FunctionCode model."""
 
     model = models.FunctionCode

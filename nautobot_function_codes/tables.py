@@ -51,7 +51,7 @@ class FunctionCodeTable(BaseTable):
 class DeviceFunctionCodeColumn(tables.Column):
     """Custom column rendering Function Code on Device list views."""
 
-    def render(self, record, value):
+    def render(self, value, record):
         """Render the Function Code badge and link for a device row."""
         function_code = value
         if function_code is None:

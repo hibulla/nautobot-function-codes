@@ -29,13 +29,7 @@ class FunctionCodeForm(NautobotModelForm):
         """Meta attributes."""
 
         model = models.FunctionCode
-        fields = [
-            "name",
-            "slug",
-            "description",
-            "color",
-            "is_active",
-        ]
+        fields = "__all__"
 
 
 class FunctionCodeBulkEditForm(NautobotBulkEditForm):

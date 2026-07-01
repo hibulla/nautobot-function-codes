@@ -26,4 +26,4 @@ class NautobotFunctionCodesConfig(NautobotAppConfig):
     override_views = "views.override_views"
 
 
-config = NautobotFunctionCodesConfig
+config = NautobotFunctionCodesConfig  # pylint: disable=invalid-name

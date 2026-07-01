@@ -3,6 +3,8 @@
 from django.core.management.base import BaseCommand
 from django.db import DEFAULT_DB_ALIAS
 
+from nautobot_function_codes.models import FunctionCode
+
 
 class Command(BaseCommand):
     """Populate the database with various data as a baseline for testing (automated or manual)."""
@@ -24,8 +26,6 @@ class Command(BaseCommand):
 
     def _generate_static_data(self, db):
         """Generate static FunctionCode records for manual testing."""
-        from nautobot_function_codes.models import FunctionCode
-
         defaults = [
             {"name": "WAN", "slug": "wan", "description": "Wide area network device", "color": "#2196f3"},
             {"name": "ACC", "slug": "acc", "description": "Access layer device", "color": "#4caf50"},
@@ -39,8 +39,6 @@ class Command(BaseCommand):
         """Entry point to the management command."""
         if options["flush"]:
             self.stdout.write("Flushing existing Nautobot Function Codes test data...")
-            from nautobot_function_codes.models import FunctionCode
-
             FunctionCode.objects.using(options["database"]).all().delete()
 
         self._generate_static_data(db=options["database"])

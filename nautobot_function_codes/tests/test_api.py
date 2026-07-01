@@ -4,6 +4,7 @@ from nautobot.apps.testing import APIViewTestCases
 
 from nautobot_function_codes import models
 from nautobot_function_codes.tests import fixtures
+from nautobot_function_codes.tests.utils import create_test_device
 
 
 class FunctionCodeAPIViewTest(APIViewTestCases.APIViewTestCase):
@@ -55,8 +56,6 @@ class DeviceFunctionCodeAssignmentAPIViewTest(APIViewTestCases.APIViewTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        from nautobot_function_codes.tests.utils import create_test_device
-
         cls.function_code = fixtures.create_functioncode_with(name="COR", slug="cor")
         cls.device = create_test_device(name="api-device-1")
         cls.create_data = [

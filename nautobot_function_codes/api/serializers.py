@@ -7,7 +7,7 @@ from nautobot_function_codes import models
 
 
 class FunctionCodeSerializer(NautobotModelSerializer):
-    """FunctionCode REST API serializer."""
+    """Serialize FunctionCode records for the REST API."""
 
     device_count = serializers.IntegerField(read_only=True)
 
@@ -15,36 +15,14 @@ class FunctionCodeSerializer(NautobotModelSerializer):
         """Meta attributes."""
 
         model = models.FunctionCode
-        fields = [
-            "id",
-            "url",
-            "display",
-            "name",
-            "slug",
-            "description",
-            "color",
-            "is_active",
-            "device_count",
-            "created",
-            "last_updated",
-            "notes_url",
-            "custom_fields",
-        ]
+        fields = "__all__"
 
 
 class DeviceFunctionCodeAssignmentSerializer(NautobotModelSerializer):
-    """DeviceFunctionCodeAssignment REST API serializer."""
+    """Serialize DeviceFunctionCodeAssignment records for the REST API."""
 
     class Meta:
         """Meta attributes."""
 
         model = models.DeviceFunctionCodeAssignment
-        fields = [
-            "id",
-            "url",
-            "display",
-            "device",
-            "function_code",
-            "created",
-            "last_updated",
-        ]
+        fields = "__all__"

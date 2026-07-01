@@ -29,7 +29,7 @@ class FunctionCodeFilterSet(NameSearchFilterSet, NautobotFilterSet):
         """Meta attributes."""
 
         model = models.FunctionCode
-        fields = ["id", "name", "slug", "description", "color", "is_active", "created", "last_updated"]
+        fields = "__all__"
 
 
 class DeviceFunctionCodeAssignmentFilterSet(NautobotFilterSet):
@@ -46,4 +46,4 @@ class DeviceFunctionCodeAssignmentFilterSet(NautobotFilterSet):
         """Meta attributes."""
 
         model = models.DeviceFunctionCodeAssignment
-        fields = ["id", "device_id", "function_code", "created", "last_updated"]
+        fields = "__all__"

@@ -3,6 +3,7 @@
 from nautobot.apps.testing import TestCase
 
 from nautobot_function_codes import models
+from nautobot_function_codes.filter_extensions import DeviceFilterExtension
 from nautobot_function_codes.tests import fixtures
 from nautobot_function_codes.tests.utils import create_test_device
 from nautobot_function_codes.utils import get_device_function_code, set_device_function_code
@@ -21,8 +22,6 @@ class DeviceFunctionCodeIntegrationTest(TestCase):
         self.assertEqual(get_device_function_code(self.device), self.function_code)
 
     def test_device_filter_extension_field_prefix(self):
-        from nautobot_function_codes.filter_extensions import DeviceFilterExtension
-
         self.assertIn("nautobot_function_codes_function_code", DeviceFilterExtension.filterset_fields)
 
     def test_assignment_deleted_with_device(self):

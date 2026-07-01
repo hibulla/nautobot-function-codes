@@ -1,6 +1,7 @@
 """FunctionCode model."""
 
 from django.db import models
+from django.urls import reverse
 from nautobot.apps.constants import CHARFIELD_MAX_LENGTH
 from nautobot.apps.models import OrganizationalModel, extras_features
 from nautobot.core.models.fields import ColorField
@@ -39,6 +40,4 @@ class FunctionCode(OrganizationalModel):
 
     def get_absolute_url(self):
         """Return the URL to the FunctionCode detail view."""
-        from django.urls import reverse
-
         return reverse("plugins:nautobot_function_codes:functioncode", kwargs={"pk": self.pk})
