@@ -2,6 +2,7 @@
 
 import uuid
 
+import django.core.serializers.json
 import django.db.models.deletion
 import nautobot.core.models.fields
 from django.db import migrations, models
@@ -30,6 +31,14 @@ class Migration(migrations.Migration):
                 ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "_custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=django.core.serializers.json.DjangoJSONEncoder,
+                    ),
+                ),
                 ("name", models.CharField(max_length=255, unique=True)),
                 ("slug", models.SlugField(max_length=255, unique=True)),
                 ("description", models.TextField(blank=True)),
