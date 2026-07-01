@@ -1,0 +1,10 @@
+{% load helpers %}
+{% if function_code %}
+<a href="{{ function_code.get_absolute_url }}">
+    <span class="badge" style="background-color: {{ function_code.color }};">&nbsp;</span>
+    {{ function_code.name }}
+</a>
+<span class="text-muted">({{ function_code.slug }})</span>
+{% else %}
+<span class="text-muted">&mdash;</span>
+{% endif %}
