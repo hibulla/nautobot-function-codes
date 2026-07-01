@@ -17,7 +17,6 @@ class FunctionCodeFilterTestCase(FilterTestCases.FilterTestCase):
         ("last_updated",),
         ("name",),
         ("slug",),
-        ("is_active",),
     )
 
     @classmethod
@@ -44,3 +43,11 @@ class FunctionCodeFilterTestCase(FilterTestCases.FilterTestCase):
     def test_q_invalid(self):
         params = {"q": "test-five"}
         self.assertEqual(self.filterset(params, self.queryset).qs.count(), 0)
+
+    def test_is_active_filter(self):
+        active_code = fixtures.create_functioncode_with(name="Active Code", slug="active-code", is_active=True)
+        inactive_code = fixtures.create_functioncode_with(name="Inactive Code", slug="inactive-code", is_active=False)
+
+        self.assertIn(active_code, self.filterset({"is_active": True}, self.queryset).qs)
+        self.assertIn(inactive_code, self.filterset({"is_active": False}, self.queryset).qs)
+        self.assertNotIn(inactive_code, self.filterset({"is_active": True}, self.queryset).qs)

@@ -21,9 +21,6 @@ class FunctionCodeFilterSet(NameSearchFilterSet, NautobotFilterSet):
             "description": "icontains",
         },
     )
-    is_active = django_filters.BooleanFilter()
-    name = django_filters.CharFilter()
-    slug = django_filters.CharFilter()
 
     class Meta:
         """Meta attributes."""
