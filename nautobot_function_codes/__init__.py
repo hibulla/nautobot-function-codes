@@ -20,7 +20,9 @@ class NautobotFunctionCodesConfig(NautobotAppConfig):
     min_version = "3.1.0"
     max_version = "4.0.0"
     required_settings = []
-    default_settings = {}
+    default_settings = {
+        "debug_logging": True,
+    }
     docs_view_name = "plugins:nautobot_function_codes:docs"
     searchable_models = ["functioncode"]
 

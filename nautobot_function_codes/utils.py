@@ -1,5 +1,6 @@
 """Utility helpers for device Function Code assignment."""
 
+from nautobot_function_codes.debug_utils import debug_log
 from nautobot_function_codes.models import DeviceFunctionCodeAssignment, FunctionCode
 
 
@@ -21,7 +22,13 @@ def set_device_function_code(device, function_code):
     if function_code is not None and not isinstance(function_code, FunctionCode):
         raise TypeError("function_code must be a FunctionCode instance or None")
 
-    assignment, _created = DeviceFunctionCodeAssignment.objects.get_or_create(device=device)
+    assignment, created = DeviceFunctionCodeAssignment.objects.get_or_create(device=device)
     assignment.function_code = function_code
     assignment.validated_save()
+    debug_log(
+        "set_device_function_code: device_pk=%s function_code_pk=%s created=%s",
+        device.pk,
+        getattr(function_code, "pk", None),
+        created,
+    )
     return assignment
