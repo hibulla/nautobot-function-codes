@@ -2,6 +2,4 @@
 
 from nautobot_function_codes.views.function_code import FunctionCodeUIViewSet
 
-__all__ = (
-    "FunctionCodeUIViewSet",
-)
+__all__ = ("FunctionCodeUIViewSet",)
