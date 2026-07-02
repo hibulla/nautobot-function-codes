@@ -60,6 +60,7 @@ def _view_class_name(callback):
 
 
 def _integration_state_result():
+    """Return a diagnostic result for Device UI integration state."""
     integrated = is_device_view_integration_complete()
     return DiagnosticResult(
         status="ok" if integrated else "error",
@@ -69,6 +70,7 @@ def _integration_state_result():
 
 
 def _device_form_class_result():
+    """Return a diagnostic result for the Device edit form class."""
     form_ok = DeviceUIViewSet.form_class is DeviceFormWithFunctionCode
     form_class_name = getattr(DeviceUIViewSet.form_class, "__name__", DeviceUIViewSet.form_class)
     return DiagnosticResult(
@@ -79,6 +81,7 @@ def _device_form_class_result():
 
 
 def _device_bulk_form_class_result():
+    """Return a diagnostic result for the Device bulk edit form class."""
     bulk_form_ok = DeviceUIViewSet.bulk_update_form_class is DeviceBulkEditFormWithFunctionCode
     bulk_form_class_name = getattr(
         DeviceUIViewSet.bulk_update_form_class,
@@ -96,6 +99,7 @@ def _device_bulk_form_class_result():
 
 
 def _device_update_wrapper_result():
+    """Return a diagnostic result for the Device update view wrapper."""
     update_ok = is_device_update_wrapped()
     return DiagnosticResult(
         status="ok" if update_ok else "warning",
@@ -109,6 +113,7 @@ def _device_update_wrapper_result():
 
 
 def _url_override_result(qualified_view_name, expected_detail):
+    """Return a diagnostic result for a Device URL override initkwargs check."""
     check = f"url_{qualified_view_name.replace(':', '_')}"
     try:
         callback = _resolve_url_callback(qualified_view_name)
@@ -132,6 +137,7 @@ def _url_override_result(qualified_view_name, expected_detail):
 
 
 def _device_get_object_result(device_pk):
+    """Return a diagnostic result for DeviceUIViewSet.get_object() on edit."""
     try:
         from nautobot.dcim.models import Device
 
