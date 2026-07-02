@@ -29,6 +29,7 @@ class DeviceFunctionCodeAssignmentSerializer(ValidatedModelSerializer):
             "id",
             "url",
             "display",
+            "natural_slug",
             "device",
             "function_code",
         ]
