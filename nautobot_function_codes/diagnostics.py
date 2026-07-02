@@ -9,11 +9,11 @@ from nautobot.dcim.views import DeviceUIViewSet
 
 from nautobot_function_codes.forms.device import DeviceBulkEditFormWithFunctionCode, DeviceFormWithFunctionCode
 from nautobot_function_codes.views.device_overrides import (
-    is_device_update_wrapped,
+    is_device_initialize_request_wrapped,
     is_device_view_integration_complete,
 )
 
-DEVICE_URL_OVERRIDES = {
+DEVICE_URL_CHECKS = {
     "dcim:device_edit": True,
     "dcim:device_add": False,
     "dcim:device_bulk_edit": False,
@@ -51,9 +51,14 @@ def _view_initkwargs(callback):
     return getattr(callback, "initkwargs", None)
 
 
+def _view_class(callback):
+    """Return the view class from a DRF ViewSet.as_view() callback."""
+    return getattr(callback, "cls", None) or getattr(callback, "view_class", None)
+
+
 def _view_class_name(callback):
     """Return the view class name from a DRF ViewSet.as_view() callback."""
-    view_class = getattr(callback, "cls", None) or getattr(callback, "view_class", None)
+    view_class = _view_class(callback)
     if view_class is None:
         return repr(callback)
     return view_class.__name__
@@ -98,35 +103,54 @@ def _device_bulk_form_class_result():
     )
 
 
-def _device_update_wrapper_result():
-    """Return a diagnostic result for the Device update view wrapper."""
-    update_ok = is_device_update_wrapped()
+def _device_initialize_request_result():
+    """Return a diagnostic result for the Device initialize_request patch."""
+    initialize_request_ok = is_device_initialize_request_wrapped()
     return DiagnosticResult(
-        status="ok" if update_ok else "warning",
-        check="device_update_wrapper",
+        status="ok" if initialize_request_ok else "error",
+        check="device_initialize_request",
         message=(
-            "DeviceUIViewSet.update is patched"
-            if update_ok
-            else "DeviceUIViewSet.update is not the Function Code wrapper"
+            "DeviceUIViewSet.initialize_request is patched (forces detail=True on edit)"
+            if initialize_request_ok
+            else "DeviceUIViewSet.initialize_request is not patched"
         ),
     )
 
 
-def _url_override_result(qualified_view_name, expected_detail):
-    """Return a diagnostic result for a Device URL override initkwargs check."""
+def _url_route_result(qualified_view_name, expected_detail):
+    """Return a diagnostic result for a Device UI route registration."""
     check = f"url_{qualified_view_name.replace(':', '_')}"
     try:
         callback = _resolve_url_callback(qualified_view_name)
         initkwargs = _view_initkwargs(callback) or {}
         detail = initkwargs.get("detail")
-        detail_ok = detail is expected_detail
+        view_class = _view_class(callback)
+        view_class_name = _view_class_name(callback)
+
+        if view_class is not DeviceUIViewSet:
+            return DiagnosticResult(
+                status="error",
+                check=check,
+                message=(
+                    f"{qualified_view_name} uses {view_class_name}, not DeviceUIViewSet; "
+                    "Function Code form integration will not apply"
+                ),
+            )
+
+        if detail is not expected_detail:
+            return DiagnosticResult(
+                status="warning",
+                check=check,
+                message=(
+                    f"{qualified_view_name}: detail={detail} (expected {expected_detail}), "
+                    f"callback={view_class_name}. initialize_request patch should still protect edit."
+                ),
+            )
+
         return DiagnosticResult(
-            status="ok" if detail_ok else "error",
+            status="ok",
             check=check,
-            message=(
-                f"{qualified_view_name}: detail={detail} (expected {expected_detail}), "
-                f"callback={_view_class_name(callback)}, initkwargs={initkwargs}"
-            ),
+            message=(f"{qualified_view_name}: detail={detail}, callback={view_class_name}, initkwargs={initkwargs}"),
         )
     except (Resolver404, NoReverseMatch, ValueError) as exc:
         return DiagnosticResult(
@@ -157,9 +181,9 @@ def _device_get_object_result(device_pk):
         request.user = user
 
         viewset = DeviceUIViewSet()
-        viewset.setup(request, pk=str(device.pk))
-        viewset.action = "update"
-        viewset.detail = True
+        viewset.action_map = {"get": "update"}
+        viewset.detail = False
+        viewset.initialize_request(request, pk=str(device.pk))
         instance = viewset.get_object()
         return DiagnosticResult(
             status="ok" if instance is not None else "error",
@@ -186,11 +210,11 @@ def collect_device_integration_diagnostics(device_pk=None):
         _integration_state_result(),
         _device_form_class_result(),
         _device_bulk_form_class_result(),
-        _device_update_wrapper_result(),
+        _device_initialize_request_result(),
     ]
     results.extend(
-        _url_override_result(qualified_view_name, expected_detail)
-        for qualified_view_name, expected_detail in DEVICE_URL_OVERRIDES.items()
+        _url_route_result(qualified_view_name, expected_detail)
+        for qualified_view_name, expected_detail in DEVICE_URL_CHECKS.items()
     )
     if device_pk:
         results.append(_device_get_object_result(device_pk))

@@ -48,13 +48,19 @@ invoke unittest
 
 ## Device Integration Notes
 
-This plugin overrides the following core Device views to add a Function Code field to create, edit, and bulk edit forms:
+This plugin extends the native Device create, edit, and bulk edit forms by patching
+the shared `DeviceUIViewSet` class (form class, save hooks, and edit routing guard).
+It does **not** register `override_views` for `dcim:device_*` URLs, so it does not
+compete with other plugins for Device route ownership.
 
-- `dcim:device_add`
-- `dcim:device_edit`
-- `dcim:device_bulk_edit`
+If another plugin replaces `dcim:device_edit` with a view class other than
+`DeviceUIViewSet`, the Function Code field will not appear on that custom form.
 
-If another plugin overrides the same views, only one override will take effect. See the plugin documentation for API patterns to read device assignments without modifying the core Device API.
+Run diagnostics after deployment:
+
+```bash
+nautobot-server diagnose_nautobot_function_codes --device-pk <uuid>
+```
 
 ## Tags
 
