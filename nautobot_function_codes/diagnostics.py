@@ -8,7 +8,16 @@ from django.urls.resolvers import URLPattern
 from nautobot.dcim.views import DeviceUIViewSet
 
 from nautobot_function_codes.forms.device import DeviceBulkEditFormWithFunctionCode, DeviceFormWithFunctionCode
-from nautobot_function_codes.views import device_overrides
+from nautobot_function_codes.views.device_overrides import (
+    is_device_update_wrapped,
+    is_device_view_integration_complete,
+)
+
+DEVICE_URL_OVERRIDES = {
+    "dcim:device_edit": True,
+    "dcim:device_add": False,
+    "dcim:device_bulk_edit": False,
+}
 
 
 @dataclass(frozen=True)
@@ -50,118 +59,119 @@ def _view_class_name(callback):
     return view_class.__name__
 
 
+def _integration_state_result():
+    integrated = is_device_view_integration_complete()
+    return DiagnosticResult(
+        status="ok" if integrated else "error",
+        check="integration_state",
+        message=f"Device integration flag integrated={integrated}",
+    )
+
+
+def _device_form_class_result():
+    form_ok = DeviceUIViewSet.form_class is DeviceFormWithFunctionCode
+    form_class_name = getattr(DeviceUIViewSet.form_class, "__name__", DeviceUIViewSet.form_class)
+    return DiagnosticResult(
+        status="ok" if form_ok else "error",
+        check="device_form_class",
+        message=f"DeviceUIViewSet.form_class={form_class_name} (expected {DeviceFormWithFunctionCode.__name__})",
+    )
+
+
+def _device_bulk_form_class_result():
+    bulk_form_ok = DeviceUIViewSet.bulk_update_form_class is DeviceBulkEditFormWithFunctionCode
+    bulk_form_class_name = getattr(
+        DeviceUIViewSet.bulk_update_form_class,
+        "__name__",
+        DeviceUIViewSet.bulk_update_form_class,
+    )
+    return DiagnosticResult(
+        status="ok" if bulk_form_ok else "error",
+        check="device_bulk_form_class",
+        message=(
+            f"DeviceUIViewSet.bulk_update_form_class={bulk_form_class_name} "
+            f"(expected {DeviceBulkEditFormWithFunctionCode.__name__})"
+        ),
+    )
+
+
+def _device_update_wrapper_result():
+    update_ok = is_device_update_wrapped()
+    return DiagnosticResult(
+        status="ok" if update_ok else "warning",
+        check="device_update_wrapper",
+        message=(
+            "DeviceUIViewSet.update is patched"
+            if update_ok
+            else "DeviceUIViewSet.update is not the Function Code wrapper"
+        ),
+    )
+
+
+def _url_override_result(qualified_view_name, expected_detail):
+    check = f"url_{qualified_view_name.replace(':', '_')}"
+    try:
+        callback = _resolve_url_callback(qualified_view_name)
+        initkwargs = _view_initkwargs(callback) or {}
+        detail = initkwargs.get("detail")
+        detail_ok = detail is expected_detail
+        return DiagnosticResult(
+            status="ok" if detail_ok else "error",
+            check=check,
+            message=(
+                f"{qualified_view_name}: detail={detail} (expected {expected_detail}), "
+                f"callback={_view_class_name(callback)}, initkwargs={initkwargs}"
+            ),
+        )
+    except (Resolver404, NoReverseMatch, ValueError) as exc:
+        return DiagnosticResult(
+            status="error",
+            check=check,
+            message=f"Could not inspect {qualified_view_name}: {exc}",
+        )
+
+
+def _device_get_object_result(device_pk):
+    try:
+        from nautobot.dcim.models import Device
+
+        device = Device.objects.get(pk=device_pk)
+        viewset = DeviceUIViewSet()
+        viewset.action = "update"
+        viewset.kwargs = {"pk": str(device.pk)}
+        viewset.detail = True
+        instance = viewset.get_object()
+        return DiagnosticResult(
+            status="ok" if instance is not None else "error",
+            check="device_get_object",
+            message=(
+                f"get_object() returned {type(instance).__name__ if instance else None} "
+                f"for pk={device_pk}, present_in_database={getattr(instance, 'present_in_database', None)}"
+            ),
+        )
+    except Exception as exc:  # pylint: disable=broad-except
+        return DiagnosticResult(
+            status="error",
+            check="device_get_object",
+            message=f"get_object() failed for pk={device_pk}: {type(exc).__name__}: {exc}",
+        )
+
+
 def collect_device_integration_diagnostics(device_pk=None):
     """Collect diagnostics for Device UI integration.
 
     Returns a list of DiagnosticResult entries suitable for logging or CLI output.
     """
-    results = []
-
-    state = device_overrides._STATE  # pylint: disable=protected-access
-    results.append(
-        DiagnosticResult(
-            status="ok" if state.integrated else "error",
-            check="integration_state",
-            message=f"Device integration flag integrated={state.integrated}",
-        )
+    results = [
+        _integration_state_result(),
+        _device_form_class_result(),
+        _device_bulk_form_class_result(),
+        _device_update_wrapper_result(),
+    ]
+    results.extend(
+        _url_override_result(qualified_view_name, expected_detail)
+        for qualified_view_name, expected_detail in DEVICE_URL_OVERRIDES.items()
     )
-
-    form_ok = DeviceUIViewSet.form_class is DeviceFormWithFunctionCode
-    results.append(
-        DiagnosticResult(
-            status="ok" if form_ok else "error",
-            check="device_form_class",
-            message=(
-                f"DeviceUIViewSet.form_class={getattr(DeviceUIViewSet.form_class, '__name__', DeviceUIViewSet.form_class)} "
-                f"(expected {DeviceFormWithFunctionCode.__name__})"
-            ),
-        )
-    )
-
-    bulk_form_ok = DeviceUIViewSet.bulk_update_form_class is DeviceBulkEditFormWithFunctionCode
-    results.append(
-        DiagnosticResult(
-            status="ok" if bulk_form_ok else "error",
-            check="device_bulk_form_class",
-            message=(
-                "DeviceUIViewSet.bulk_update_form_class="
-                f"{getattr(DeviceUIViewSet.bulk_update_form_class, '__name__', DeviceUIViewSet.bulk_update_form_class)} "
-                f"(expected {DeviceBulkEditFormWithFunctionCode.__name__})"
-            ),
-        )
-    )
-
-    update_ok = DeviceUIViewSet.update is device_overrides._update_with_function_code
-    results.append(
-        DiagnosticResult(
-            status="ok" if update_ok else "warning",
-            check="device_update_wrapper",
-            message=(
-                "DeviceUIViewSet.update is patched"
-                if update_ok
-                else "DeviceUIViewSet.update is not the Function Code wrapper"
-            ),
-        )
-    )
-
-    expected_detail = {
-        "dcim:device_edit": True,
-        "dcim:device_add": False,
-        "dcim:device_bulk_edit": False,
-    }
-    for qualified_view_name, expected in expected_detail.items():
-        try:
-            callback = _resolve_url_callback(qualified_view_name)
-            initkwargs = _view_initkwargs(callback) or {}
-            detail = initkwargs.get("detail")
-            detail_ok = detail is expected
-            results.append(
-                DiagnosticResult(
-                    status="ok" if detail_ok else "error",
-                    check=f"url_{qualified_view_name.replace(':', '_')}",
-                    message=(
-                        f"{qualified_view_name}: detail={detail} (expected {expected}), "
-                        f"callback={_view_class_name(callback)}, initkwargs={initkwargs}"
-                    ),
-                )
-            )
-        except (Resolver404, NoReverseMatch, ValueError) as exc:
-            results.append(
-                DiagnosticResult(
-                    status="error",
-                    check=f"url_{qualified_view_name.replace(':', '_')}",
-                    message=f"Could not inspect {qualified_view_name}: {exc}",
-                )
-            )
-
     if device_pk:
-        try:
-            from nautobot.dcim.models import Device
-
-            device = Device.objects.get(pk=device_pk)
-            viewset = DeviceUIViewSet()
-            viewset.action = "update"
-            viewset.kwargs = {"pk": str(device.pk)}
-            viewset.detail = True
-            instance = viewset.get_object()
-            results.append(
-                DiagnosticResult(
-                    status="ok" if instance is not None else "error",
-                    check="device_get_object",
-                    message=(
-                        f"get_object() returned {type(instance).__name__ if instance else None} "
-                        f"for pk={device_pk}, present_in_database="
-                        f"{getattr(instance, 'present_in_database', None)}"
-                    ),
-                )
-            )
-        except Exception as exc:  # pylint: disable=broad-except
-            results.append(
-                DiagnosticResult(
-                    status="error",
-                    check="device_get_object",
-                    message=f"get_object() failed for pk={device_pk}: {type(exc).__name__}: {exc}",
-                )
-            )
-
+        results.append(_device_get_object_result(device_pk))
     return results

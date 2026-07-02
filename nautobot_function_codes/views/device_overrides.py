@@ -78,6 +78,16 @@ def _update_with_function_code(self, request, *args, **kwargs):
         raise
 
 
+def is_device_view_integration_complete():
+    """Return True when Device UI integration has been applied."""
+    return _STATE.integrated
+
+
+def is_device_update_wrapped():
+    """Return True when DeviceUIViewSet.update uses the Function Code wrapper."""
+    return DeviceUIViewSet.update is _update_with_function_code
+
+
 def integrate_device_views():
     """Extend the core Device UI with Function Code support.
 
