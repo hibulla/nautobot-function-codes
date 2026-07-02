@@ -9,6 +9,8 @@ from nautobot.dcim.views import DeviceUIViewSet
 
 from nautobot_function_codes.forms.device import DeviceBulkEditFormWithFunctionCode, DeviceFormWithFunctionCode
 from nautobot_function_codes.views.device_overrides import (
+    get_device_create_template_name,
+    is_device_get_template_name_wrapped,
     is_device_initialize_request_wrapped,
     is_device_view_integration_complete,
 )
@@ -117,6 +119,21 @@ def _device_initialize_request_result():
     )
 
 
+def _device_template_result():
+    """Return a diagnostic result for the Device create/edit template patch."""
+    template_ok = is_device_get_template_name_wrapped()
+    template_name = get_device_create_template_name()
+    return DiagnosticResult(
+        status="ok" if template_ok else "error",
+        check="device_create_template",
+        message=(
+            f"DeviceUIViewSet.get_template_name uses {template_name}"
+            if template_ok
+            else "DeviceUIViewSet.get_template_name is not patched"
+        ),
+    )
+
+
 def _url_route_result(qualified_view_name, expected_detail):
     """Return a diagnostic result for a Device UI route registration."""
     check = f"url_{qualified_view_name.replace(':', '_')}"
@@ -188,10 +205,28 @@ def _device_edit_http_result(device_pk):
         client.force_login(user)
         url = reverse("dcim:device_edit", kwargs={"pk": device_pk})
         response = client.get(url)
+        if response.status_code != 200:
+            return DiagnosticResult(
+                status="error",
+                check="device_edit_http",
+                message=f"GET {url} returned HTTP {response.status_code}",
+            )
+
+        content = response.content.decode(response.charset or "utf-8")
+        if 'name="function_code"' not in content:
+            return DiagnosticResult(
+                status="error",
+                check="device_edit_http",
+                message=(
+                    f"GET {url} returned HTTP 200 but HTML is missing the Function Code form field "
+                    '(expected name="function_code")'
+                ),
+            )
+
         return DiagnosticResult(
-            status="ok" if response.status_code == 200 else "error",
+            status="ok",
             check="device_edit_http",
-            message=f"GET {url} returned HTTP {response.status_code}",
+            message=f"GET {url} returned HTTP 200 with Function Code form field",
         )
     except Exception as exc:  # pylint: disable=broad-except
         return DiagnosticResult(
@@ -211,6 +246,7 @@ def collect_device_integration_diagnostics(device_pk=None):
         _device_form_class_result(),
         _device_bulk_form_class_result(),
         _device_initialize_request_result(),
+        _device_template_result(),
     ]
     results.extend(
         _url_route_result(qualified_view_name, expected_detail)

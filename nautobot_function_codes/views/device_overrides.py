@@ -15,7 +15,9 @@ class _DeviceViewIntegrationState:
     """Hold original Device viewset hooks while integrating Function Code support."""
 
     integrated = False
+    device_create_template = "nautobot_function_codes/dcim/device_create.html"
     original_get_queryset = None
+    original_get_template_name = None
     original_initialize_request = None
     original_process_create_or_update_form = None
     original_process_bulk_update_form = None
@@ -30,6 +32,17 @@ def _get_queryset_with_function_code(self):
     if self.action in ("retrieve", "list", "update"):
         queryset = queryset.select_related("function_code_assignment__function_code")
     return queryset
+
+
+def _get_template_name_with_function_code(self):
+    """Use a Device create/edit template that renders the Function Code field.
+
+    Core ``dcim/device_create.html`` lists each field explicitly, so extra form
+    fields from ``DeviceFormWithFunctionCode`` are omitted unless we extend it.
+    """
+    if self.action in ("create", "update"):
+        return _STATE.device_create_template
+    return _STATE.original_get_template_name(self)
 
 
 def _initialize_request_with_function_code(self, request, *args, **kwargs):
@@ -74,6 +87,7 @@ def _process_bulk_update_form_with_function_code(self, form):
 def _patch_device_viewset():
     """Patch DeviceUIViewSet hooks used by the Function Code integration."""
     _STATE.original_get_queryset = DeviceUIViewSet.get_queryset
+    _STATE.original_get_template_name = DeviceUIViewSet.get_template_name
     _STATE.original_initialize_request = DeviceUIViewSet.initialize_request
     _STATE.original_process_create_or_update_form = DeviceUIViewSet._process_create_or_update_form
     _STATE.original_process_bulk_update_form = DeviceUIViewSet._process_bulk_update_form
@@ -81,6 +95,7 @@ def _patch_device_viewset():
     DeviceUIViewSet.form_class = DeviceFormWithFunctionCode
     DeviceUIViewSet.bulk_update_form_class = DeviceBulkEditFormWithFunctionCode
     DeviceUIViewSet.get_queryset = _get_queryset_with_function_code
+    DeviceUIViewSet.get_template_name = _get_template_name_with_function_code
     DeviceUIViewSet.initialize_request = _initialize_request_with_function_code
     DeviceUIViewSet._process_create_or_update_form = _process_create_or_update_form_with_function_code
     DeviceUIViewSet._process_bulk_update_form = _process_bulk_update_form_with_function_code
@@ -94,6 +109,16 @@ def is_device_view_integration_complete():
 def is_device_initialize_request_wrapped():
     """Return True when DeviceUIViewSet.initialize_request uses the Function Code wrapper."""
     return DeviceUIViewSet.initialize_request is _initialize_request_with_function_code
+
+
+def is_device_get_template_name_wrapped():
+    """Return True when DeviceUIViewSet.get_template_name uses the Function Code wrapper."""
+    return DeviceUIViewSet.get_template_name is _get_template_name_with_function_code
+
+
+def get_device_create_template_name():
+    """Return the plugin template used for Device create/edit views."""
+    return _STATE.device_create_template
 
 
 def integrate_device_views():

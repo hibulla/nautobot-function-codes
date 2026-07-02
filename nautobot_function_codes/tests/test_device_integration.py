@@ -61,7 +61,13 @@ class DeviceEditViewIntegrationTest(TestCase):
     def test_device_edit_view_shows_function_code_field(self):
         url = reverse("dcim:device_edit", kwargs={"pk": self.device.pk})
         response = self.client.get(url)
+        self.assertContains(response, 'name="function_code"')
         self.assertContains(response, "Function Code")
+
+    def test_device_add_view_shows_function_code_field(self):
+        url = reverse("dcim:device_add")
+        response = self.client.get(url)
+        self.assertContains(response, 'name="function_code"')
 
     def test_device_add_view_returns_200(self):
         url = reverse("dcim:device_add")
@@ -72,3 +78,12 @@ class DeviceEditViewIntegrationTest(TestCase):
         from nautobot.dcim.views import DeviceUIViewSet
 
         self.assertIs(DeviceUIViewSet.form_class, DeviceFormWithFunctionCode)
+
+    def test_device_create_template_is_extended(self):
+        from nautobot.dcim.views import DeviceUIViewSet
+
+        from nautobot_function_codes.views.device_overrides import get_device_create_template_name
+
+        view = DeviceUIViewSet()
+        view.action = "update"
+        self.assertEqual(view.get_template_name(), get_device_create_template_name())
