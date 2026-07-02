@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from django.urls import get_resolver
 from django.urls.exceptions import NoReverseMatch, Resolver404
 from django.urls.resolvers import URLPattern
-
 from nautobot.dcim.views import DeviceUIViewSet
 
 from nautobot_function_codes.forms.device import DeviceBulkEditFormWithFunctionCode, DeviceFormWithFunctionCode
