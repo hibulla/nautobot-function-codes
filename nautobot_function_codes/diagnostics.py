@@ -160,45 +160,44 @@ def _url_route_result(qualified_view_name, expected_detail):
         )
 
 
-def _device_get_object_result(device_pk):
-    """Return a diagnostic result for DeviceUIViewSet.get_object() on edit."""
+def _device_edit_http_result(device_pk):
+    """Return a diagnostic result for the Device edit HTTP view."""
     try:
         from django.contrib.auth import get_user_model
-        from django.test import RequestFactory
+        from django.test import Client
+        from django.urls import reverse
         from nautobot.dcim.models import Device
 
-        device = Device.objects.get(pk=device_pk)
+        if not Device.objects.filter(pk=device_pk).exists():
+            return DiagnosticResult(
+                status="error",
+                check="device_edit_http",
+                message=f"No Device found with pk={device_pk}",
+            )
+
         user_model = get_user_model()
         user = user_model.objects.filter(is_superuser=True).first()
         if user is None:
             return DiagnosticResult(
                 status="warning",
-                check="device_get_object",
-                message="Skipped get_object() check: no superuser in database",
+                check="device_edit_http",
+                message="Skipped Device edit HTTP check: no superuser in database",
             )
 
-        request = RequestFactory().get(f"/dcim/devices/{device.pk}/edit/")
-        request.user = user
-
-        viewset = DeviceUIViewSet()
-        viewset.action_map = {"get": "update"}
-        viewset.kwargs = {"pk": str(device.pk)}
-        viewset.detail = False
-        viewset.request = viewset.initialize_request(request, pk=str(device.pk))
-        instance = viewset.get_object()
+        client = Client()
+        client.force_login(user)
+        url = reverse("dcim:device_edit", kwargs={"pk": device_pk})
+        response = client.get(url)
         return DiagnosticResult(
-            status="ok" if instance is not None else "error",
-            check="device_get_object",
-            message=(
-                f"get_object() returned {type(instance).__name__ if instance else None} "
-                f"for pk={device_pk}, present_in_database={getattr(instance, 'present_in_database', None)}"
-            ),
+            status="ok" if response.status_code == 200 else "error",
+            check="device_edit_http",
+            message=f"GET {url} returned HTTP {response.status_code}",
         )
     except Exception as exc:  # pylint: disable=broad-except
         return DiagnosticResult(
             status="error",
-            check="device_get_object",
-            message=f"get_object() failed for pk={device_pk}: {type(exc).__name__}: {exc}",
+            check="device_edit_http",
+            message=f"Device edit HTTP check failed for pk={device_pk}: {type(exc).__name__}: {exc}",
         )
 
 
@@ -218,5 +217,5 @@ def collect_device_integration_diagnostics(device_pk=None):
         for qualified_view_name, expected_detail in DEVICE_URL_CHECKS.items()
     )
     if device_pk:
-        results.append(_device_get_object_result(device_pk))
+        results.append(_device_edit_http_result(device_pk))
     return results

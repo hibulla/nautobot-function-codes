@@ -9,7 +9,7 @@ from nautobot_function_codes.diagnostics import collect_device_integration_diagn
 class Command(BaseCommand):
     """Print Device integration diagnostics for troubleshooting."""
 
-    help = "Run Function Codes plugin diagnostics (Device UI integration, URL overrides, optional get_object check)."
+    help = "Run Function Codes plugin diagnostics (Device UI integration, URL routes, optional edit HTTP check)."
 
     def add_arguments(self, parser):
         """Add command line arguments."""
@@ -17,7 +17,7 @@ class Command(BaseCommand):
             "--device-pk",
             dest="device_pk",
             default=None,
-            help="Optional Device UUID to verify DeviceUIViewSet.get_object() for edit view.",
+            help="Optional Device UUID to verify GET /dcim/devices/<pk>/edit/ returns HTTP 200.",
         )
 
     def handle(self, *args, **options):
