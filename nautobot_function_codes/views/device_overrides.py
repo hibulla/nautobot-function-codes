@@ -14,9 +14,9 @@ class DeviceUIViewSetWithFunctionCode(DeviceUIViewSet):
     bulk_update_form_class = DeviceBulkEditFormWithFunctionCode
 
     def get_queryset(self):
-        """Prefetch Function Code assignment data for list and detail views."""
+        """Prefetch Function Code assignment data for list, detail, and edit views."""
         queryset = super().get_queryset()
-        if self.action in ("retrieve", "list"):
+        if self.action in ("retrieve", "list", "update"):
             queryset = queryset.select_related("function_code_assignment__function_code")
         return queryset
 
@@ -36,6 +36,10 @@ class DeviceUIViewSetWithFunctionCode(DeviceUIViewSet):
 
 override_views = {
     "dcim:device_add": DeviceUIViewSetWithFunctionCode.as_view({"get": "create", "post": "create"}),
-    "dcim:device_edit": DeviceUIViewSetWithFunctionCode.as_view({"get": "update", "post": "update"}),
+    # detail=True is required so Nautobot loads the Device instance when rendering the edit form.
+    "dcim:device_edit": DeviceUIViewSetWithFunctionCode.as_view(
+        {"get": "update", "post": "update"},
+        detail=True,
+    ),
     "dcim:device_bulk_edit": DeviceUIViewSetWithFunctionCode.as_view({"get": "bulk_update", "post": "bulk_update"}),
 }

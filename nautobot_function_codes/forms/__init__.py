@@ -81,10 +81,16 @@ class DeviceFunctionCodeFormMixin(forms.Form):
     def __init__(self, *args, **kwargs):
         """Initialize the form and pre-populate the current Function Code assignment."""
         super().__init__(*args, **kwargs)
-        if getattr(self.instance, "present_in_database", False):
-            assignment = getattr(self.instance, "function_code_assignment", None)
-            if assignment is not None and assignment.function_code_id:
-                self.initial["function_code"] = assignment.function_code_id
+        if self.instance is None or not self.instance.present_in_database:
+            return
+
+        try:
+            assignment = self.instance.function_code_assignment
+        except models.DeviceFunctionCodeAssignment.DoesNotExist:
+            assignment = None
+
+        if assignment is not None and assignment.function_code_id:
+            self.initial["function_code"] = assignment.function_code_id
 
 
 class DeviceBulkEditFunctionCodeFormMixin(forms.Form):
