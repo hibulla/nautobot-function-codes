@@ -36,6 +36,20 @@ class DeviceIntegrationDiagnosticsTest(TestCase):
         self.assertIn("device_get_object", checks)
         self.assertEqual(checks["device_get_object"].status, "ok", checks["device_get_object"].message)
 
+    def test_device_get_object_via_initialize_request(self):
+        request = RequestFactory().get(f"/dcim/devices/{self.device.pk}/edit/")
+        request.user = self.user
+
+        viewset = DeviceUIViewSet()
+        viewset.action_map = {"get": "update"}
+        viewset.kwargs = {"pk": str(self.device.pk)}
+        viewset.detail = False
+        viewset.request = viewset.initialize_request(request, pk=str(self.device.pk))
+
+        self.assertTrue(viewset.detail)
+        instance = viewset.get_object()
+        self.assertEqual(instance.pk, self.device.pk)
+
     def test_device_update_initialize_request_forces_detail(self):
         request = RequestFactory().get(f"/dcim/devices/{self.device.pk}/edit/")
         request.user = self.user

@@ -182,8 +182,9 @@ def _device_get_object_result(device_pk):
 
         viewset = DeviceUIViewSet()
         viewset.action_map = {"get": "update"}
+        viewset.kwargs = {"pk": str(device.pk)}
         viewset.detail = False
-        viewset.initialize_request(request, pk=str(device.pk))
+        viewset.request = viewset.initialize_request(request, pk=str(device.pk))
         instance = viewset.get_object()
         return DiagnosticResult(
             status="ok" if instance is not None else "error",
