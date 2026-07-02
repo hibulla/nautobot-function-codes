@@ -11,6 +11,11 @@ class DeviceIntegrationDiagnosticsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        from django.contrib.auth import get_user_model
+
+        user_model = get_user_model()
+        if not user_model.objects.filter(is_superuser=True).exists():
+            user_model.objects.create_superuser("diagnostics", "diagnostics@example.com", "password")
         cls.device = create_test_device(name="diagnostics-device")
 
     def test_collect_device_integration_diagnostics_passes(self):
@@ -27,4 +32,4 @@ class DeviceIntegrationDiagnosticsTest(TestCase):
         checks = {result.check: result for result in results}
 
         self.assertIn("device_get_object", checks)
-        self.assertEqual(checks["device_get_object"].status, "ok")
+        self.assertEqual(checks["device_get_object"].status, "ok", checks["device_get_object"].message)

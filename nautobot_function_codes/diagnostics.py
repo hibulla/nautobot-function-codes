@@ -139,12 +139,26 @@ def _url_override_result(qualified_view_name, expected_detail):
 def _device_get_object_result(device_pk):
     """Return a diagnostic result for DeviceUIViewSet.get_object() on edit."""
     try:
+        from django.contrib.auth import get_user_model
+        from django.test import RequestFactory
         from nautobot.dcim.models import Device
 
         device = Device.objects.get(pk=device_pk)
+        user_model = get_user_model()
+        user = user_model.objects.filter(is_superuser=True).first()
+        if user is None:
+            return DiagnosticResult(
+                status="warning",
+                check="device_get_object",
+                message="Skipped get_object() check: no superuser in database",
+            )
+
+        request = RequestFactory().get(f"/dcim/devices/{device.pk}/edit/")
+        request.user = user
+
         viewset = DeviceUIViewSet()
+        viewset.setup(request, pk=str(device.pk))
         viewset.action = "update"
-        viewset.kwargs = {"pk": str(device.pk)}
         viewset.detail = True
         instance = viewset.get_object()
         return DiagnosticResult(
