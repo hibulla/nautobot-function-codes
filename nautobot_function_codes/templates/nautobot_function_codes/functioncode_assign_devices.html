@@ -35,4 +35,7 @@
     </form>
 {% endblock content %}
 
+{% block javascript %}
+    {{ block.super }}
+    {{ form.media }}
 {% endblock javascript %}
