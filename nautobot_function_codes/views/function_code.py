@@ -21,7 +21,7 @@ class FunctionCodeUIViewSet(NautobotUIViewSet):
     table_class = tables.FunctionCodeTable
 
     object_detail_content = ObjectDetailContent(
-        buttons=[
+        extra_buttons=[
             Button(
                 weight=100,
                 label="Assign Devices",
