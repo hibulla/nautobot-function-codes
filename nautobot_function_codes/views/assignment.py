@@ -32,6 +32,7 @@ class BulkAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredMixin, Vi
         return "nautobot_function_codes.change_functioncode"
 
     def _default_return_url(self):
+        """Return the Device Assignments list URL used when no return_url is provided."""
         return reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_list")
 
     def get(self, request):
