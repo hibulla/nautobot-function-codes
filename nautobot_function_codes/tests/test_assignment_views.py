@@ -35,10 +35,29 @@ class DeviceAssignmentViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_assignment_create_returns_200(self):
+    def test_assignment_create_shows_bulk_assign_form(self):
         url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_add")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="function_code"')
+        self.assertContains(response, 'name="devices"')
+        self.assertContains(response, 'id="id_devices"')
+        self.assertContains(response, "multiple")
+        self.assertContains(response, "embedded_action_modal")
+
+    def test_assignment_create_post_assigns_multiple_devices(self):
+        url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_add")
+        response = self.client.post(
+            url,
+            {
+                "function_code": str(self.function_code.pk),
+                "devices": [str(device.pk) for device in self.devices[:2]],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(get_device_function_code(self.devices[0]), self.function_code)
+        self.assertEqual(get_device_function_code(self.devices[1]), self.function_code)
+        self.assertIsNone(get_device_function_code(self.devices[2]))
 
     def test_assign_devices_view_get_returns_200(self):
         url = reverse(
@@ -48,6 +67,7 @@ class DeviceAssignmentViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="devices"')
+        self.assertNotContains(response, 'name="function_code"')
         self.assertContains(response, 'id="id_devices"')
         self.assertContains(response, "multiple")
         self.assertContains(response, "embedded_action_modal")

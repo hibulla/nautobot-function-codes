@@ -11,9 +11,14 @@ from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
 
+_DEVICES_FIELD_HELP_TEXT = (
+    "Select multiple devices: pick one from the dropdown, then search and add more "
+    "(each appears as a tag), or use the search button to filter and add devices."
+)
+
 
 class DeviceFunctionCodeAssignmentForm(forms.ModelForm):
-    """Create or edit a single Device Function Code assignment."""
+    """Edit an existing Device Function Code assignment."""
 
     class Meta:
         """Meta attributes."""
@@ -56,15 +61,29 @@ class DeviceFunctionCodeAssignmentFilterForm(NautobotFilterForm):
 
 
 class FunctionCodeAssignDevicesForm(forms.Form):
-    """Assign one or more devices to a Function Code."""
+    """Assign one or more devices to a Function Code selected on the previous screen."""
 
     devices = DynamicModelMultipleChoiceField(
         queryset=Device.objects.all(),
         required=True,
         label="Devices",
         embedded_search=True,
-        help_text=(
-            "Select multiple devices: pick one from the dropdown, then search and add more "
-            "(each appears as a tag), or use the search button to filter and add devices."
-        ),
+        help_text=_DEVICES_FIELD_HELP_TEXT,
+    )
+
+
+class BulkAssignDevicesForm(forms.Form):
+    """Assign one or more devices to a chosen Function Code."""
+
+    function_code = DynamicModelChoiceField(
+        queryset=models.FunctionCode.objects.filter(is_active=True),
+        required=True,
+        label="Function Code",
+    )
+    devices = DynamicModelMultipleChoiceField(
+        queryset=Device.objects.all(),
+        required=True,
+        label="Devices",
+        embedded_search=True,
+        help_text=_DEVICES_FIELD_HELP_TEXT,
     )

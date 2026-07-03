@@ -5,8 +5,8 @@ A Nautobot plugin for managing reusable Function Codes and assigning them to dev
 ## Features
 
 - Create and manage Function Codes (name, slug, description, color, active status)
-- Assign devices to Function Codes from the plugin UI (single device or many at once)
-- Device Assignments list with create, edit, bulk edit, and delete
+- Assign devices to Function Codes via bulk Assign Devices (from Function Code detail or Device Assignments)
+- Device Assignments list for view, edit, bulk edit, and delete
 - REST API and GraphQL support
 - Global and list search, filtering, and CSV import/export
 - Object permissions, changelog, notes, custom fields, relationships, custom links, and webhooks
@@ -52,9 +52,10 @@ invoke unittest
 
 Device assignments are managed from the **Function Codes** plugin UI:
 
-1. **Function Codes → Device Assignments** — list, create, edit, bulk edit, and delete assignments
-2. **Function Code detail → Assign Devices** — assign multiple devices to one Function Code at once
-3. **Function Code detail → Assigned Devices** — view devices already linked to a Function Code
+1. **Function Code detail → Assign Devices** — assign many devices to that Function Code
+2. **Function Codes → Device Assignments → Add** — same bulk form with Function Code and Devices fields
+3. **Function Codes → Device Assignments** — list, edit, bulk edit, and delete existing assignments
+4. **Function Code detail → Assigned Devices** — view devices already linked to a Function Code
 
 The REST API endpoint `/api/plugins/function-codes/device-assignments/` is also available for automation.
 

@@ -81,4 +81,4 @@ class FunctionCodeAssignedDevicesPanel(ObjectsTablePanel):
     table_attribute = "device_assignments"
     related_field_name = "function_code"
     exclude_columns = ["function_code"]
-    add_button_route = "plugins:nautobot_function_codes:devicefunctioncodeassignment_add"
+    add_button_route = None
