@@ -34,6 +34,7 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
     """Assign multiple devices to a single Function Code."""
 
     template_name = "nautobot_function_codes/functioncode_assign_devices.html"
+    queryset = models.FunctionCode.objects.all()
 
     def get_required_permission(self):
         """Require permission to change Function Code assignments."""

@@ -6,14 +6,13 @@ from nautobot.apps.forms import (
     DynamicModelMultipleChoiceField,
     NautobotBulkEditForm,
     NautobotFilterForm,
-    NautobotModelForm,
 )
 from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
 
 
-class DeviceFunctionCodeAssignmentForm(NautobotModelForm):
+class DeviceFunctionCodeAssignmentForm(forms.ModelForm):
     """Create or edit a single Device Function Code assignment."""
 
     class Meta:

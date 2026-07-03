@@ -73,5 +73,5 @@ class DeviceAssignmentViewTest(TestCase):
         url = reverse("plugins:nautobot_function_codes:functioncode", kwargs={"pk": self.function_code.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Assigned Devices")
+        self.assertContains(response, "ASSIGNED DEVICES")
         self.assertContains(response, self.devices[0].name)
