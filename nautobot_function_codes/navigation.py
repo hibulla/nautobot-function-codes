@@ -17,11 +17,12 @@ function_code_items = (
     NavMenuItem(
         link="plugins:nautobot_function_codes:devicefunctioncodeassignment_list",
         name="Device Assignments",
-        permissions=["nautobot_function_codes.view_devicefunctioncodeassignment"],
+        # Reuse Function Code view permission so the menu stays visible for the same roles.
+        permissions=["nautobot_function_codes.view_functioncode"],
         buttons=(
             NavMenuAddButton(
                 link="plugins:nautobot_function_codes:devicefunctioncodeassignment_add",
-                permissions=["nautobot_function_codes.add_devicefunctioncodeassignment"],
+                permissions=["nautobot_function_codes.add_functioncode"],
             ),
         ),
     ),

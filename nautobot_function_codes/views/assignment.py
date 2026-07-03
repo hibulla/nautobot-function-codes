@@ -38,7 +38,7 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
 
     def get_required_permission(self):
         """Require permission to change Function Code assignments."""
-        return "nautobot_function_codes.change_devicefunctioncodeassignment"
+        return "nautobot_function_codes.change_functioncode"
 
     def get(self, request, pk):
         """Render the bulk assignment form."""

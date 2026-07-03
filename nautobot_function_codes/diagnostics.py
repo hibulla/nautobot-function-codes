@@ -1,6 +1,7 @@
 """Runtime diagnostics for nautobot_function_codes."""
 
 from dataclasses import dataclass
+from importlib import metadata
 
 from django.urls import reverse
 
@@ -82,9 +83,27 @@ def _assignment_list_http_result():
         )
 
 
+def _plugin_version_result():
+    """Return a diagnostic result for the installed plugin package version."""
+    try:
+        version = metadata.version("nautobot-function-codes")
+        return DiagnosticResult(
+            status="ok",
+            check="plugin_version",
+            message=f"Installed nautobot-function-codes version: {version}",
+        )
+    except metadata.PackageNotFoundError:
+        return DiagnosticResult(
+            status="warning",
+            check="plugin_version",
+            message="Installed nautobot-function-codes package version is unknown (editable or non-standard install)",
+        )
+
+
 def collect_plugin_diagnostics():
     """Collect diagnostics for the Function Codes plugin."""
     return [
+        _plugin_version_result(),
         _plugin_models_result(),
         _assignment_ui_routes_result(),
         _assignment_list_http_result(),
