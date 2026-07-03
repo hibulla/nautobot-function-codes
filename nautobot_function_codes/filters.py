@@ -1,12 +1,12 @@
 """Filtering for nautobot_function_codes."""
 
-import django_filters
 from nautobot.apps.filters import (
     NameSearchFilterSet,
     NaturalKeyOrPKMultipleChoiceFilter,
     NautobotFilterSet,
     SearchFilter,
 )
+from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
 
@@ -32,7 +32,11 @@ class FunctionCodeFilterSet(NameSearchFilterSet, NautobotFilterSet):
 class DeviceFunctionCodeAssignmentFilterSet(NautobotFilterSet):
     """FilterSet for DeviceFunctionCodeAssignment."""
 
-    device_id = django_filters.UUIDFilter(field_name="device__id")
+    device = NaturalKeyOrPKMultipleChoiceFilter(
+        field_name="device",
+        queryset=Device.objects.all(),
+        to_field_name="name",
+    )
     function_code = NaturalKeyOrPKMultipleChoiceFilter(
         field_name="function_code",
         queryset=models.FunctionCode.objects.all(),
