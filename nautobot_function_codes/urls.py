@@ -10,13 +10,17 @@ from nautobot_function_codes import views
 app_name = "nautobot_function_codes"
 router = NautobotUIViewSetRouter()
 
-# The standard is for the route to be the hyphenated version of the model class name plural.
-# for example, ExampleModel would be example-models.
 router.register("function-codes", views.FunctionCodeUIViewSet)
+router.register("device-assignments", views.DeviceFunctionCodeAssignmentUIViewSet)
 
 
 urlpatterns = [
     path("docs/", RedirectView.as_view(url=static("nautobot_function_codes/docs/index.html")), name="docs"),
+    path(
+        "function-codes/<uuid:pk>/assign-devices/",
+        views.FunctionCodeAssignDevicesView.as_view(),
+        name="functioncode_assign_devices",
+    ),
 ]
 
 urlpatterns += router.urls

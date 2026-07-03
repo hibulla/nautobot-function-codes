@@ -3,31 +3,21 @@
 from django.core.management.base import BaseCommand
 
 from nautobot_function_codes.debug_utils import is_debug_logging_enabled
-from nautobot_function_codes.diagnostics import collect_device_integration_diagnostics
+from nautobot_function_codes.diagnostics import collect_plugin_diagnostics
 
 
 class Command(BaseCommand):
-    """Print Device integration diagnostics for troubleshooting."""
+    """Print plugin diagnostics for troubleshooting."""
 
-    help = "Run Function Codes plugin diagnostics (Device UI integration, URL routes, optional edit HTTP check)."
-
-    def add_arguments(self, parser):
-        """Add command line arguments."""
-        parser.add_argument(
-            "--device-pk",
-            dest="device_pk",
-            default=None,
-            help="Optional Device UUID to verify GET /dcim/devices/<pk>/edit/ returns HTTP 200.",
-        )
+    help = "Run Function Codes plugin diagnostics (models, assignment UI routes, optional HTTP checks)."
 
     def handle(self, *args, **options):
         """Execute diagnostics and print a human-readable report."""
-        device_pk = options.get("device_pk")
         self.stdout.write("Nautobot Function Codes diagnostics")
         self.stdout.write(f"debug_logging={is_debug_logging_enabled()}")
         self.stdout.write("")
 
-        results = collect_device_integration_diagnostics(device_pk=device_pk)
+        results = collect_plugin_diagnostics()
         has_errors = False
         for result in results:
             prefix = result.status.upper()

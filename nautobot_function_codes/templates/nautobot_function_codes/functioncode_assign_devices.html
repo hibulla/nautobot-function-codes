@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load form_helpers %}
+
+{% block title %}Assign Devices to {{ function_code.name }}{% endblock title %}
+
+{% block content %}
+    <form action="" method="post" class="h-100 vstack">
+        {% csrf_token %}
+        <div class="row justify-content-center align-content-start flex-fill">
+            <div class="col-lg-8 col-md-10 mb-10">
+                <h3>Assign Devices to {{ function_code }}</h3>
+                <p class="text-muted">
+                    Select one or more devices. Each device can have only one Function Code; existing assignments are updated.
+                </p>
+            </div>
+            <div class="col-lg-8 col-md-10">
+                <div class="card">
+                    <div class="card-header"><strong>Devices</strong></div>
+                    <div class="card-body">
+                        {% render_form form %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nb-form-sticky-footer">
+            <button type="submit" class="btn btn-primary">
+                <span aria-hidden="true" class="mdi mdi-check me-4"></span><!--
+                -->Assign
+            </button>
+            <a href="{{ return_url }}" class="btn btn-secondary">
+                <span aria-hidden="true" class="mdi mdi-close me-4"></span><!--
+                -->Cancel
+            </a>
+        </div>
+    </form>
+{% endblock content %}
+
+{% endblock javascript %}

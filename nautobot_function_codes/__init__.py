@@ -26,12 +26,5 @@ class NautobotFunctionCodesConfig(NautobotAppConfig):
     docs_view_name = "plugins:nautobot_function_codes:docs"
     searchable_models = ["functioncode"]
 
-    def ready(self):
-        """Register plugin features and extend the core Device UI."""
-        super().ready()
-        from nautobot_function_codes.views.device_overrides import integrate_device_views
-
-        integrate_device_views()
-
 
 config = NautobotFunctionCodesConfig  # pylint: disable=invalid-name

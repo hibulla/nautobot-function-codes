@@ -18,4 +18,10 @@ The Function Code model represents an operational classification for network dev
 
 Devices are linked to Function Codes through the internal `DeviceFunctionCodeAssignment` model. Each device may have at most one Function Code assigned.
 
-Use the Device create/edit form or the `/api/plugins/function-codes/device-assignments/` API endpoint to manage assignments.
+Manage assignments from the plugin UI:
+
+- **Function Codes → Device Assignments** for single-record create/edit and bulk updates
+- **Function Code detail → Assign Devices** to assign multiple devices at once
+- **Function Code detail → Assigned Devices** panel to review current links
+
+The `/api/plugins/function-codes/device-assignments/` API endpoint is available for automation.

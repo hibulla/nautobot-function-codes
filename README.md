@@ -5,11 +5,13 @@ A Nautobot plugin for managing reusable Function Codes and assigning them to dev
 ## Features
 
 - Create and manage Function Codes (name, slug, description, color, active status)
-- Assign exactly one Function Code to each device via the native Device form
+- Assign devices to Function Codes from the plugin UI (single device or many at once)
+- Device Assignments list with create, edit, bulk edit, and delete
 - REST API and GraphQL support
 - Global and list search, filtering, and CSV import/export
 - Object permissions, changelog, notes, custom fields, relationships, custom links, and webhooks
 - Device list filtering by Function Code
+- Read-only Function Code panel on Device detail pages
 
 ## Installation
 
@@ -46,20 +48,20 @@ invoke start
 invoke unittest
 ```
 
-## Device Integration Notes
+## Managing Device Assignments
 
-This plugin extends the native Device create, edit, and bulk edit forms by patching
-the shared `DeviceUIViewSet` class (form class, save hooks, and edit routing guard).
-It does **not** register `override_views` for `dcim:device_*` URLs, so it does not
-compete with other plugins for Device route ownership.
+Device assignments are managed from the **Function Codes** plugin UI:
 
-If another plugin replaces `dcim:device_edit` with a view class other than
-`DeviceUIViewSet`, the Function Code field will not appear on that custom form.
+1. **Function Codes → Device Assignments** — list, create, edit, bulk edit, and delete assignments
+2. **Function Code detail → Assign Devices** — assign multiple devices to one Function Code at once
+3. **Function Code detail → Assigned Devices** — view devices already linked to a Function Code
+
+The REST API endpoint `/api/plugins/function-codes/device-assignments/` is also available for automation.
 
 Run diagnostics after deployment:
 
 ```bash
-nautobot-server diagnose_nautobot_function_codes --device-pk <uuid>
+nautobot-server diagnose_nautobot_function_codes
 ```
 
 ## Tags

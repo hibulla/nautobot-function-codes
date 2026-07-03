@@ -1,5 +1,7 @@
 """Utility helpers for device Function Code assignment."""
 
+from django.db import transaction
+
 from nautobot_function_codes.debug_utils import debug_log
 from nautobot_function_codes.models import DeviceFunctionCodeAssignment, FunctionCode
 
@@ -32,3 +34,17 @@ def set_device_function_code(device, function_code):
         created,
     )
     return assignment
+
+
+def assign_devices_to_function_code(function_code, devices):
+    """Assign multiple devices to the same Function Code."""
+    with transaction.atomic():
+        assignments = [set_device_function_code(device, function_code) for device in devices]
+    return assignments
+
+
+def unassign_devices(devices):
+    """Clear Function Code assignments for the given devices."""
+    with transaction.atomic():
+        assignments = [set_device_function_code(device, None) for device in devices]
+    return assignments

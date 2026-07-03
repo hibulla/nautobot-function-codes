@@ -2,24 +2,9 @@
 
 from dataclasses import dataclass
 
-from django.urls import get_resolver
-from django.urls.exceptions import NoReverseMatch, Resolver404
-from django.urls.resolvers import URLPattern
-from nautobot.dcim.views import DeviceUIViewSet
+from django.urls import reverse
 
-from nautobot_function_codes.forms.device import DeviceBulkEditFormWithFunctionCode, DeviceFormWithFunctionCode
-from nautobot_function_codes.views.device_overrides import (
-    get_device_create_template_name,
-    is_device_get_template_name_wrapped,
-    is_device_initialize_request_wrapped,
-    is_device_view_integration_complete,
-)
-
-DEVICE_URL_CHECKS = {
-    "dcim:device_edit": True,
-    "dcim:device_add": False,
-    "dcim:device_bulk_edit": False,
-}
+from nautobot_function_codes import models
 
 
 @dataclass(frozen=True)
@@ -31,227 +16,80 @@ class DiagnosticResult:
     message: str
 
 
-def _resolve_url_callback(qualified_view_name):
-    """Return the URL callback registered for a fully qualified view name."""
-    qualified_app_name, view_name = qualified_view_name.rsplit(":", 1)
-    app_resolver = get_resolver()
-    for app_name in qualified_app_name.split(":"):
-        app_resolver_tuple = app_resolver.namespace_dict.get(app_name)
-        if app_resolver_tuple is None:
-            raise Resolver404(f"Namespace '{app_name}' not found for {qualified_view_name}")
-        app_resolver = app_resolver_tuple[1]
-
-    for pattern in app_resolver.url_patterns:
-        if isinstance(pattern, URLPattern) and pattern.name == view_name:
-            return pattern.callback
-
-    raise Resolver404(f"View '{view_name}' not found under '{qualified_app_name}'")
-
-
-def _view_initkwargs(callback):
-    """Return router initkwargs from a DRF ViewSet.as_view() callback."""
-    return getattr(callback, "initkwargs", None)
-
-
-def _view_class(callback):
-    """Return the view class from a DRF ViewSet.as_view() callback."""
-    return getattr(callback, "cls", None) or getattr(callback, "view_class", None)
-
-
-def _view_class_name(callback):
-    """Return the view class name from a DRF ViewSet.as_view() callback."""
-    view_class = _view_class(callback)
-    if view_class is None:
-        return repr(callback)
-    return view_class.__name__
-
-
-def _integration_state_result():
-    """Return a diagnostic result for Device UI integration state."""
-    integrated = is_device_view_integration_complete()
+def _plugin_models_result():
+    """Return a diagnostic result for core plugin models."""
+    function_code_count = models.FunctionCode.objects.count()
+    assignment_count = models.DeviceFunctionCodeAssignment.objects.count()
     return DiagnosticResult(
-        status="ok" if integrated else "error",
-        check="integration_state",
-        message=f"Device integration flag integrated={integrated}",
-    )
-
-
-def _device_form_class_result():
-    """Return a diagnostic result for the Device edit form class."""
-    form_ok = DeviceUIViewSet.form_class is DeviceFormWithFunctionCode
-    form_class_name = getattr(DeviceUIViewSet.form_class, "__name__", DeviceUIViewSet.form_class)
-    return DiagnosticResult(
-        status="ok" if form_ok else "error",
-        check="device_form_class",
-        message=f"DeviceUIViewSet.form_class={form_class_name} (expected {DeviceFormWithFunctionCode.__name__})",
-    )
-
-
-def _device_bulk_form_class_result():
-    """Return a diagnostic result for the Device bulk edit form class."""
-    bulk_form_ok = DeviceUIViewSet.bulk_update_form_class is DeviceBulkEditFormWithFunctionCode
-    bulk_form_class_name = getattr(
-        DeviceUIViewSet.bulk_update_form_class,
-        "__name__",
-        DeviceUIViewSet.bulk_update_form_class,
-    )
-    return DiagnosticResult(
-        status="ok" if bulk_form_ok else "error",
-        check="device_bulk_form_class",
+        status="ok",
+        check="plugin_models",
         message=(
-            f"DeviceUIViewSet.bulk_update_form_class={bulk_form_class_name} "
-            f"(expected {DeviceBulkEditFormWithFunctionCode.__name__})"
+            f"FunctionCode records={function_code_count}, " f"DeviceFunctionCodeAssignment records={assignment_count}"
         ),
     )
 
 
-def _device_initialize_request_result():
-    """Return a diagnostic result for the Device initialize_request patch."""
-    initialize_request_ok = is_device_initialize_request_wrapped()
-    return DiagnosticResult(
-        status="ok" if initialize_request_ok else "error",
-        check="device_initialize_request",
-        message=(
-            "DeviceUIViewSet.initialize_request is patched (forces detail=True on edit)"
-            if initialize_request_ok
-            else "DeviceUIViewSet.initialize_request is not patched"
-        ),
-    )
-
-
-def _device_template_result():
-    """Return a diagnostic result for the Device create/edit template patch."""
-    template_ok = is_device_get_template_name_wrapped()
-    template_name = get_device_create_template_name()
-    return DiagnosticResult(
-        status="ok" if template_ok else "error",
-        check="device_create_template",
-        message=(
-            f"DeviceUIViewSet.get_template_name uses {template_name}"
-            if template_ok
-            else "DeviceUIViewSet.get_template_name is not patched"
-        ),
-    )
-
-
-def _url_route_result(qualified_view_name, expected_detail):
-    """Return a diagnostic result for a Device UI route registration."""
-    check = f"url_{qualified_view_name.replace(':', '_')}"
+def _assignment_ui_routes_result():
+    """Return a diagnostic result for assignment UI route registration."""
     try:
-        callback = _resolve_url_callback(qualified_view_name)
-        initkwargs = _view_initkwargs(callback) or {}
-        detail = initkwargs.get("detail")
-        view_class = _view_class(callback)
-        view_class_name = _view_class_name(callback)
-
-        if view_class is not DeviceUIViewSet:
-            return DiagnosticResult(
-                status="error",
-                check=check,
-                message=(
-                    f"{qualified_view_name} uses {view_class_name}, not DeviceUIViewSet; "
-                    "Function Code form integration will not apply"
-                ),
-            )
-
-        if detail is not expected_detail:
-            return DiagnosticResult(
-                status="warning",
-                check=check,
-                message=(
-                    f"{qualified_view_name}: detail={detail} (expected {expected_detail}), "
-                    f"callback={view_class_name}. initialize_request patch should still protect edit."
-                ),
-            )
-
+        list_url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_list")
+        assign_url = reverse(
+            "plugins:nautobot_function_codes:functioncode_assign_devices",
+            kwargs={"pk": "00000000-0000-0000-0000-000000000001"},
+        )
         return DiagnosticResult(
             status="ok",
-            check=check,
-            message=(f"{qualified_view_name}: detail={detail}, callback={view_class_name}, initkwargs={initkwargs}"),
+            check="assignment_ui_routes",
+            message=f"Assignment UI routes registered: list={list_url}, assign_devices={assign_url}",
         )
-    except (Resolver404, NoReverseMatch, ValueError) as exc:
+    except Exception as exc:  # pylint: disable=broad-except
         return DiagnosticResult(
             status="error",
-            check=check,
-            message=f"Could not inspect {qualified_view_name}: {exc}",
+            check="assignment_ui_routes",
+            message=f"Assignment UI routes are not registered: {type(exc).__name__}: {exc}",
         )
 
 
-def _device_edit_http_result(device_pk):
-    """Return a diagnostic result for the Device edit HTTP view."""
+def _assignment_list_http_result():
+    """Return a diagnostic result for the assignment list HTTP view."""
     try:
         from django.contrib.auth import get_user_model
         from django.test import Client
-        from django.urls import reverse
-        from nautobot.dcim.models import Device
-
-        if not Device.objects.filter(pk=device_pk).exists():
-            return DiagnosticResult(
-                status="error",
-                check="device_edit_http",
-                message=f"No Device found with pk={device_pk}",
-            )
 
         user_model = get_user_model()
         user = user_model.objects.filter(is_superuser=True).first()
         if user is None:
             return DiagnosticResult(
                 status="warning",
-                check="device_edit_http",
-                message="Skipped Device edit HTTP check: no superuser in database",
+                check="assignment_list_http",
+                message="Skipped assignment list HTTP check: no superuser in database",
             )
 
         client = Client()
         client.force_login(user)
-        url = reverse("dcim:device_edit", kwargs={"pk": device_pk})
+        url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_list")
         response = client.get(url)
-        if response.status_code != 200:
-            return DiagnosticResult(
-                status="error",
-                check="device_edit_http",
-                message=f"GET {url} returned HTTP {response.status_code}",
-            )
-
-        content = response.content.decode(response.charset or "utf-8")
-        if 'name="function_code"' not in content:
-            return DiagnosticResult(
-                status="error",
-                check="device_edit_http",
-                message=(
-                    f"GET {url} returned HTTP 200 but HTML is missing the Function Code form field "
-                    '(expected name="function_code")'
-                ),
-            )
-
         return DiagnosticResult(
-            status="ok",
-            check="device_edit_http",
-            message=f"GET {url} returned HTTP 200 with Function Code form field",
+            status="ok" if response.status_code == 200 else "error",
+            check="assignment_list_http",
+            message=f"GET {url} returned HTTP {response.status_code}",
         )
     except Exception as exc:  # pylint: disable=broad-except
         return DiagnosticResult(
             status="error",
-            check="device_edit_http",
-            message=f"Device edit HTTP check failed for pk={device_pk}: {type(exc).__name__}: {exc}",
+            check="assignment_list_http",
+            message=f"Assignment list HTTP check failed: {type(exc).__name__}: {exc}",
         )
 
 
-def collect_device_integration_diagnostics(device_pk=None):
-    """Collect diagnostics for Device UI integration.
-
-    Returns a list of DiagnosticResult entries suitable for logging or CLI output.
-    """
-    results = [
-        _integration_state_result(),
-        _device_form_class_result(),
-        _device_bulk_form_class_result(),
-        _device_initialize_request_result(),
-        _device_template_result(),
+def collect_plugin_diagnostics():
+    """Collect diagnostics for the Function Codes plugin."""
+    return [
+        _plugin_models_result(),
+        _assignment_ui_routes_result(),
+        _assignment_list_http_result(),
     ]
-    results.extend(
-        _url_route_result(qualified_view_name, expected_detail)
-        for qualified_view_name, expected_detail in DEVICE_URL_CHECKS.items()
-    )
-    if device_pk:
-        results.append(_device_edit_http_result(device_pk))
-    return results
+
+
+# Backward-compatible alias for the management command module path.
+collect_device_integration_diagnostics = collect_plugin_diagnostics

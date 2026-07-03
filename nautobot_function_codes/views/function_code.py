@@ -1,7 +1,7 @@
 """Views for FunctionCode."""
 
 from django.db.models import Count
-from nautobot.apps.ui import ObjectDetailContent, ObjectFieldsPanel, SectionChoices
+from nautobot.apps.ui import Button, ObjectDetailContent, ObjectFieldsPanel, SectionChoices
 from nautobot.apps.views import NautobotUIViewSet
 
 from nautobot_function_codes import filters, forms, models, tables
@@ -21,6 +21,15 @@ class FunctionCodeUIViewSet(NautobotUIViewSet):
     table_class = tables.FunctionCodeTable
 
     object_detail_content = ObjectDetailContent(
+        buttons=[
+            Button(
+                weight=100,
+                label="Assign Devices",
+                icon="mdi-server-plus",
+                link_name="plugins:nautobot_function_codes:functioncode_assign_devices",
+                required_permissions=["nautobot_function_codes.change_devicefunctioncodeassignment"],
+            ),
+        ],
         panels=[
             ObjectFieldsPanel(
                 weight=100,
@@ -34,6 +43,10 @@ class FunctionCodeUIViewSet(NautobotUIViewSet):
                     "created",
                     "last_updated",
                 ],
+            ),
+            tables.FunctionCodeAssignedDevicesPanel(
+                weight=200,
+                section=SectionChoices.RIGHT_HALF,
             ),
         ],
     )

@@ -1,9 +1,8 @@
 """Tables for nautobot_function_codes."""
 
 import django_tables2 as tables
-from django.urls import reverse
-from django.utils.html import format_html
 from nautobot.apps.tables import BaseTable, BooleanColumn, ButtonsColumn, ColorColumn, LinkedCountColumn, ToggleColumn
+from nautobot.apps.ui import ObjectsTablePanel
 
 from nautobot_function_codes import models
 
@@ -17,8 +16,8 @@ class FunctionCodeTable(BaseTable):
     color = ColorColumn()
     is_active = BooleanColumn()
     device_count = LinkedCountColumn(
-        viewname="dcim:device_list",
-        url_params={"nautobot_function_codes_function_code": "slug"},
+        viewname="plugins:nautobot_function_codes:devicefunctioncodeassignment_list",
+        url_params={"function_code": "slug"},
         verbose_name="Devices",
     )
     actions = ButtonsColumn(models.FunctionCode, pk_field="pk")
@@ -48,18 +47,38 @@ class FunctionCodeTable(BaseTable):
         )
 
 
-class DeviceFunctionCodeColumn(tables.Column):
-    """Custom column rendering Function Code on Device list views."""
+class DeviceFunctionCodeAssignmentTable(BaseTable):
+    """Table for Device Function Code assignment list views."""
 
-    def render(self, value, record):
-        """Render the Function Code badge and link for a device row."""
-        function_code = value
-        if function_code is None:
-            return format_html('<span class="text-muted">&mdash;</span>')
-        url = reverse("plugins:nautobot_function_codes:functioncode", kwargs={"pk": function_code.pk})
-        label = format_html(
-            '<span class="badge" style="background-color: #{};">&nbsp;</span> {}',
-            function_code.color,
-            function_code.name,
+    pk = ToggleColumn()
+    device = tables.Column(linkify=True, order_by=("device__name",))
+    function_code = tables.Column(linkify=True, order_by=("function_code__name",))
+    actions = ButtonsColumn(models.DeviceFunctionCodeAssignment, pk_field="pk")
+
+    class Meta(BaseTable.Meta):
+        """Meta attributes."""
+
+        model = models.DeviceFunctionCodeAssignment
+        fields = (
+            "pk",
+            "device",
+            "function_code",
+            "actions",
         )
-        return format_html('<a href="{}">{}</a>', url, label)
+        default_columns = (
+            "pk",
+            "device",
+            "function_code",
+            "actions",
+        )
+
+
+class FunctionCodeAssignedDevicesPanel(ObjectsTablePanel):
+    """Detail panel listing devices assigned to a Function Code."""
+
+    label = "Assigned Devices"
+    table_class = DeviceFunctionCodeAssignmentTable
+    table_attribute = "device_assignments"
+    related_field_name = "function_code"
+    exclude_columns = ["function_code"]
+    add_button_route = "plugins:nautobot_function_codes:devicefunctioncodeassignment_add"
