@@ -87,3 +87,7 @@ class BulkAssignDevicesForm(forms.Form):
         embedded_search=True,
         help_text=_DEVICES_FIELD_HELP_TEXT,
     )
+
+    def __init__(self, *args, instance=None, **kwargs):
+        """Accept Nautobot create-view kwargs such as ``instance`` for non-model forms."""
+        super().__init__(*args, **kwargs)
