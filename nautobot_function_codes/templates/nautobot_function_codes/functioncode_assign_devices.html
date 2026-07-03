@@ -4,7 +4,7 @@
 {% block title %}Assign Devices to {{ function_code.name }}{% endblock title %}
 
 {% block content %}
-    <form action="" method="post" class="h-100 vstack">
+    <form action="" method="post" class="h-100 vstack" id="nb-create-form" data-nb-obj-type="Device Function Code Assignment">
         {% csrf_token %}
         <div class="row justify-content-center align-content-start flex-fill">
             <div class="col-lg-8 col-md-10 mb-10">
@@ -33,9 +33,82 @@
             </a>
         </div>
     </form>
+    <div class="modal fade" data-bs-backdrop="static" id="embedded_action_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div
+                class="modal-content"
+                hx-on:htmx:before-swap="window.nb.embeddedAction.handleEnd(event);"
+                hx-on:htmx:load="jsify_form(this);"
+            ></div>
+        </div>
+    </div>
 {% endblock content %}
 
 {% block javascript %}
     {{ block.super }}
     {{ form.media }}
+    <script>
+        (() => {
+            const handleEnd = (event) => {
+                const obj = (() => {
+                    try {
+                        const obj = JSON.parse(event.detail.serverResponse);
+                        return obj?.id ? obj : undefined;
+                    } catch (exception) {
+                        return undefined;
+                    }
+                })();
+
+                if (obj) {
+                    event.preventDefault();
+
+                    const targetField = document.querySelector(
+                        `#nb-create-form select[name="${window.nb.embeddedAction.targetFieldName}"]`,
+                    );
+                    if (targetField) {
+                        const targetFieldValue = [...targetField.selectedOptions].map((option) => ({
+                            text: option.innerText,
+                            value: option.value,
+                        }));
+                        window.nb.select2.setSelect2Value(targetField, [
+                            ...(targetField.getAttribute("multiple") !== null ? targetFieldValue : []),
+                            {
+                                text: _.get(obj, targetField.getAttribute("display-field")) || obj.name,
+                                value: _.get(obj, targetField.getAttribute("value-field")) || obj.id,
+                            },
+                        ]);
+                    }
+
+                    const modal = document.querySelector("#embedded_action_modal");
+                    bootstrap.Modal.getInstance(modal).hide();
+                    window.nb.messages.refreshMessages("{% url 'messages' %}");
+                }
+            };
+
+            const handleStart = ({ targetFieldName }) => {
+                const modal = document.querySelector("#embedded_action_modal");
+                const content = modal.querySelector(".modal-content");
+                content.innerHTML =
+                    '<div class="spinner-border mx-auto my-16"><span class="visually-hidden">Loading...</span></div>';
+                window.nb.embeddedAction.targetFieldName = targetFieldName;
+            };
+
+            window.nb = window.nb || {};
+            window.nb.embeddedAction = { handleEnd, handleStart, targetFieldName: null };
+        })();
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const select = document.getElementById("id_devices");
+            if (!select || !window.jQuery) {
+                return;
+            }
+            select.setAttribute("multiple", "multiple");
+            const $select = window.jQuery(select);
+            if ($select.data("select2")) {
+                $select.select2("destroy");
+            }
+            window.nb.select2.initializeSelect2Fields(select.closest("form"));
+        });
+    </script>
 {% endblock javascript %}

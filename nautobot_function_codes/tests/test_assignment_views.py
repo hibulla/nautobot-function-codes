@@ -48,6 +48,9 @@ class DeviceAssignmentViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="devices"')
+        self.assertContains(response, 'id="id_devices"')
+        self.assertContains(response, "multiple")
+        self.assertContains(response, "embedded_action_modal")
 
     def test_assign_devices_view_post_assigns_multiple_devices(self):
         url = reverse(

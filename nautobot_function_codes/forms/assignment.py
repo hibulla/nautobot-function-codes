@@ -62,5 +62,9 @@ class FunctionCodeAssignDevicesForm(forms.Form):
         queryset=Device.objects.all(),
         required=True,
         label="Devices",
-        help_text="Selected devices will be assigned to this Function Code. Existing assignments are updated.",
+        embedded_search=True,
+        help_text=(
+            "Select multiple devices: pick one from the dropdown, then search and add more "
+            "(each appears as a tag), or use the search button to filter and add devices."
+        ),
     )
