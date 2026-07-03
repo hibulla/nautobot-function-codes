@@ -16,6 +16,7 @@ class DeviceAssignmentCountColumn(LinkedCountColumn):
     """Always render a linked count badge, even when only one device is assigned."""
 
     def render(self, *, bound_column, record, value):
+        """Render a linked badge with the assignment count."""
         url = reverse(self.viewname, kwargs=self.view_kwargs)
         if self.url_params:
             url += "?" + urlencode(
