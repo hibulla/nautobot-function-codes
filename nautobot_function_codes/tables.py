@@ -1,10 +1,29 @@
 """Tables for nautobot_function_codes."""
 
 import django_tables2 as tables
+from django.conf import settings
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.http import urlencode
 from nautobot.apps.tables import BaseTable, BooleanColumn, ButtonsColumn, ColorColumn, LinkedCountColumn, ToggleColumn
 from nautobot.apps.ui import ObjectsTablePanel
+from nautobot.core.templatetags import helpers
 
 from nautobot_function_codes import models
+
+
+class DeviceAssignmentCountColumn(LinkedCountColumn):
+    """Always render a linked count badge, even when only one device is assigned."""
+
+    def render(self, *, bound_column, record, value):
+        url = reverse(self.viewname, kwargs=self.view_kwargs)
+        if self.url_params:
+            url += "?" + urlencode(
+                {k: (getattr(record, v) or settings.FILTERS_NULL_CHOICE_VALUE) for k, v in self.url_params.items()}
+            )
+        if value:
+            return format_html('<a href="{}" class="badge bg-primary">{}</a>', url, value)
+        return helpers.placeholder(value)
 
 
 class FunctionCodeTable(BaseTable):
@@ -12,10 +31,10 @@ class FunctionCodeTable(BaseTable):
 
     pk = ToggleColumn()
     name = tables.Column(linkify=True)
-    slug = tables.Column()
+    description = tables.Column()
     color = ColorColumn()
     is_active = BooleanColumn()
-    device_count = LinkedCountColumn(
+    device_count = DeviceAssignmentCountColumn(
         viewname="plugins:nautobot_function_codes:devicefunctioncodeassignment_list",
         url_params={"function_code": "slug"},
         verbose_name="Devices",
@@ -29,7 +48,6 @@ class FunctionCodeTable(BaseTable):
         fields = (
             "pk",
             "name",
-            "slug",
             "description",
             "color",
             "is_active",
@@ -39,7 +57,7 @@ class FunctionCodeTable(BaseTable):
         default_columns = (
             "pk",
             "name",
-            "slug",
+            "description",
             "color",
             "is_active",
             "device_count",
