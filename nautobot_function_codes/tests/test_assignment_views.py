@@ -41,6 +41,7 @@ class DeviceAssignmentViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'name="function_code"')
         self.assertContains(response, 'name="devices"')
+        self.assertNotContains(response, 'name="device"')
         self.assertContains(response, 'id="id_devices"')
         self.assertContains(response, "multiple")
         self.assertContains(response, "embedded_action_modal")
