@@ -9,7 +9,6 @@ from nautobot.apps.forms import (
 )
 
 from nautobot_function_codes import models
-
 from nautobot_function_codes.forms.assignment import DeviceFunctionCodeAssignmentBulkEditForm
 
 __all__ = (
