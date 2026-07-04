@@ -16,6 +16,14 @@ def get_device_function_code(device):
     return assignment.function_code
 
 
+def get_device_function_code_link(record):
+    """Return a link target for a device's assigned Function Code table column."""
+    assignment = getattr(record, "function_code_assignment", None)
+    if assignment is None or assignment.function_code is None:
+        return None
+    return assignment.function_code.get_absolute_url()
+
+
 def set_device_function_code(device, function_code):
     """Create or update the Function Code assignment for a device."""
     if function_code == "":

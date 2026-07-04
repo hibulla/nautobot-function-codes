@@ -1,12 +1,14 @@
 """Template extensions for Device integration."""
 
+from django.urls import reverse
 from nautobot.apps.ui import Panel, SectionChoices, TemplateExtension
 
+from nautobot_function_codes.forms.device import DeviceFunctionCodePanelForm
 from nautobot_function_codes.utils import get_device_function_code
 
 
 class FunctionCodeDetailPanel(Panel):
-    """Detail panel showing the assigned Function Code."""
+    """Detail panel showing and editing the assigned Function Code."""
 
     def __init__(self, **kwargs):
         """Initialize the Function Code detail panel."""
@@ -20,7 +22,20 @@ class FunctionCodeDetailPanel(Panel):
 
     def get_extra_context(self, context):
         """Return Function Code context for the panel template."""
-        return {"function_code": get_device_function_code(context["object"])}
+        device = context["object"]
+        function_code = get_device_function_code(device)
+        request = context["request"]
+        can_change = request.user.has_perm("nautobot_function_codes.change_functioncode")
+        panel_form = DeviceFunctionCodePanelForm(initial={"function_code": function_code.pk if function_code else None})
+        return {
+            "function_code": function_code,
+            "can_change_function_code": can_change,
+            "panel_form": panel_form,
+            "set_function_code_url": reverse(
+                "plugins:nautobot_function_codes:device_set_function_code",
+                kwargs={"pk": device.pk},
+            ),
+        }
 
 
 class DeviceFunctionCodeTemplateExtension(TemplateExtension):

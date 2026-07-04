@@ -39,7 +39,6 @@ class FunctionCodeBulkEditForm(NautobotBulkEditForm):
         widget=forms.MultipleHiddenInput,
     )
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 3}))
-    color = forms.CharField(required=False)
     is_active = forms.NullBooleanField(required=False)
 
     class Meta:
@@ -47,7 +46,6 @@ class FunctionCodeBulkEditForm(NautobotBulkEditForm):
 
         nullable_fields = [
             "description",
-            "color",
             "is_active",
         ]
 

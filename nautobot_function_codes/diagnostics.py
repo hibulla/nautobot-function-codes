@@ -100,12 +100,58 @@ def _plugin_version_result():
         )
 
 
+def _extended_ui_routes_result():
+    """Return a diagnostic result for v0.2 UI route registration."""
+    try:
+        coverage_url = reverse("plugins:nautobot_function_codes:coverage_dashboard")
+        import_url = reverse("plugins:nautobot_function_codes:import_assignments")
+        device_url = reverse(
+            "plugins:nautobot_function_codes:device_set_function_code",
+            kwargs={"pk": "00000000-0000-0000-0000-000000000001"},
+        )
+        return DiagnosticResult(
+            status="ok",
+            check="extended_ui_routes",
+            message=(
+                f"Extended UI routes registered: coverage={coverage_url}, "
+                f"import_assignments={import_url}, device_set_function_code={device_url}"
+            ),
+        )
+    except Exception as exc:  # pylint: disable=broad-except
+        return DiagnosticResult(
+            status="error",
+            check="extended_ui_routes",
+            message=f"Extended UI routes are not registered: {type(exc).__name__}: {exc}",
+        )
+
+
+def _jobs_module_result():
+    """Return a diagnostic result for plugin job registration."""
+    try:
+        from nautobot_function_codes.jobs import jobs as jobs_module
+
+        job_count = len(jobs_module.jobs)
+        return DiagnosticResult(
+            status="ok",
+            check="plugin_jobs",
+            message=f"Plugin jobs module loaded with {job_count} job class(es)",
+        )
+    except Exception as exc:  # pylint: disable=broad-except
+        return DiagnosticResult(
+            status="error",
+            check="plugin_jobs",
+            message=f"Plugin jobs module failed to load: {type(exc).__name__}: {exc}",
+        )
+
+
 def collect_plugin_diagnostics():
     """Collect diagnostics for the Function Codes plugin."""
     return [
         _plugin_version_result(),
         _plugin_models_result(),
         _assignment_ui_routes_result(),
+        _extended_ui_routes_result(),
+        _jobs_module_result(),
         _assignment_list_http_result(),
     ]
 

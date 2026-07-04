@@ -1,6 +1,9 @@
 """Device integration tests."""
 
+from django.contrib.auth import get_user_model
+from django.urls import reverse
 from nautobot.apps.testing import TestCase
+from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
 from nautobot_function_codes.filter_extensions import DeviceFilterExtension
@@ -23,6 +26,13 @@ class DeviceFunctionCodeIntegrationTest(TestCase):
         cls.other_function_code = fixtures.create_functioncode_with(name="WAN", slug="wan")
         cls.device = create_test_device(name="integration-device")
         cls.other_device = create_test_device(name="integration-device-2")
+        user_model = get_user_model()
+        if not user_model.objects.filter(is_superuser=True).exists():
+            user_model.objects.create_superuser("integration-user", "integration-user@example.com", "password")
+        cls.user = user_model.objects.filter(is_superuser=True).first()
+
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_set_and_get_device_function_code(self):
         set_device_function_code(self.device, self.function_code)
@@ -41,6 +51,37 @@ class DeviceFunctionCodeIntegrationTest(TestCase):
 
     def test_device_filter_extension_field_prefix(self):
         self.assertIn("nautobot_function_codes_function_code", DeviceFilterExtension.filterset_fields)
+        self.assertIn("nautobot_function_codes_has_function_code", DeviceFilterExtension.filterset_fields)
+
+    def test_device_has_function_code_filter(self):
+        set_device_function_code(self.device, self.function_code)
+        assigned = Device.objects.filter(
+            **{"function_code_assignment__function_code__isnull": False}
+        )
+        unassigned = Device.objects.filter(
+            **{"function_code_assignment__function_code__isnull": True}
+        )
+        self.assertIn(self.device, assigned)
+        self.assertIn(self.other_device, unassigned)
+
+    def test_device_set_function_code_view_updates_assignment(self):
+        url = reverse(
+            "plugins:nautobot_function_codes:device_set_function_code",
+            kwargs={"pk": self.device.pk},
+        )
+        response = self.client.post(url, {"function_code": str(self.function_code.pk)})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(get_device_function_code(self.device), self.function_code)
+
+    def test_device_set_function_code_view_clears_assignment(self):
+        set_device_function_code(self.device, self.function_code)
+        url = reverse(
+            "plugins:nautobot_function_codes:device_set_function_code",
+            kwargs={"pk": self.device.pk},
+        )
+        response = self.client.post(url, {"function_code": ""})
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNone(get_device_function_code(self.device))
 
     def test_assignment_deleted_with_device(self):
         set_device_function_code(self.device, self.function_code)

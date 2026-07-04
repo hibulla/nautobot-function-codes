@@ -1,0 +1,100 @@
+"""Tests for CSV import of device assignments."""
+
+import io
+
+from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from nautobot.apps.testing import TestCase
+
+from nautobot_function_codes.services.import_assignments import import_assignments_from_csv
+from nautobot_function_codes.tests import fixtures
+from nautobot_function_codes.tests.utils import create_test_device
+from nautobot_function_codes.utils import get_device_function_code
+
+
+class ImportAssignmentsServiceTest(TestCase):
+    """Test CSV import service logic."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.function_code = fixtures.create_functioncode_with(name="ACC", slug="acc-import")
+        cls.other_function_code = fixtures.create_functioncode_with(name="WAN", slug="wan-import")
+        cls.inactive_code = fixtures.create_functioncode_with(name="OLD", slug="old-import", is_active=False)
+        cls.device = create_test_device(name="import-device-1")
+        cls.other_device = create_test_device(name="import-device-2")
+        user_model = get_user_model()
+        if not user_model.objects.filter(is_superuser=True).exists():
+            user_model.objects.create_superuser("import-user", "import-user@example.com", "password")
+        cls.user = user_model.objects.filter(is_superuser=True).first()
+
+    def _csv(self, content):
+        return io.StringIO(content)
+
+    def test_import_assigns_and_clears_devices(self):
+        csv_data = (
+            "device,function_code\n"
+            f"{self.device.name},acc-import\n"
+            f"{self.other_device.name},\n"
+        )
+        result = import_assignments_from_csv(self._csv(csv_data), self.user)
+        self.assertEqual(result.updated, 1)
+        self.assertEqual(result.cleared, 1)
+        self.assertEqual(result.errors, 0)
+        self.assertEqual(get_device_function_code(self.device), self.function_code)
+        self.assertIsNone(get_device_function_code(self.other_device))
+
+    def test_import_dry_run_does_not_save(self):
+        csv_data = f"device,function_code\n{self.device.name},acc-import\n"
+        result = import_assignments_from_csv(self._csv(csv_data), self.user, dry_run=True)
+        self.assertEqual(result.updated, 1)
+        self.assertTrue(result.dry_run)
+        self.assertIsNone(get_device_function_code(self.device))
+
+    def test_import_rejects_unknown_device(self):
+        csv_data = "device,function_code\nmissing-device,acc-import\n"
+        result = import_assignments_from_csv(self._csv(csv_data), self.user)
+        self.assertEqual(result.errors, 1)
+        self.assertEqual(result.updated, 0)
+
+    def test_import_rejects_inactive_function_code(self):
+        csv_data = f"device,function_code\n{self.device.name},old-import\n"
+        result = import_assignments_from_csv(self._csv(csv_data), self.user)
+        self.assertEqual(result.errors, 1)
+        self.assertIsNone(get_device_function_code(self.device))
+
+
+class ImportAssignmentsViewTest(TestCase):
+    """HTTP tests for the import assignments view."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.function_code = fixtures.create_functioncode_with(name="COR", slug="cor-import-view")
+        cls.device = create_test_device(name="import-view-device")
+        user_model = get_user_model()
+        if not user_model.objects.filter(is_superuser=True).exists():
+            user_model.objects.create_superuser("import-view", "import-view@example.com", "password")
+        cls.user = user_model.objects.filter(is_superuser=True).first()
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_import_view_get_returns_200(self):
+        url = reverse("plugins:nautobot_function_codes:import_assignments")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Import Device Assignments")
+
+    def test_import_view_post_assigns_device(self):
+        url = reverse("plugins:nautobot_function_codes:import_assignments")
+        csv_content = f"device,function_code\n{self.device.name},cor-import-view\n".encode()
+        response = self.client.post(
+            url,
+            {
+                "csv_file": SimpleUploadedFile("assignments.csv", csv_content, content_type="text/csv"),
+                "dry_run": False,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "updated=1")
+        self.assertEqual(get_device_function_code(self.device), self.function_code)

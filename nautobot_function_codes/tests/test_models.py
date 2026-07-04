@@ -32,10 +32,8 @@ class TestFunctionCode(ModelTestCases.BaseModelTestCase):
             name="Development",
             slug="development-full",
             description="Development Test",
-            color="ff0000",
             is_active=False,
         )
-        self.assertEqual(functioncode.color, "ff0000")
         self.assertFalse(functioncode.is_active)
 
 

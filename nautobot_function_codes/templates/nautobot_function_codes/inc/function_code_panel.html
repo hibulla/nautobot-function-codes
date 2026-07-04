@@ -1,5 +1,23 @@
+{% load helpers %}
 {% if function_code %}
-<a href="{{ function_code.get_absolute_url }}">{{ function_code.name }}</a>
+<p class="mb-2">
+    <strong>Current:</strong>
+    <a href="{{ function_code.get_absolute_url }}">{{ function_code.name }}</a>
+</p>
 {% else %}
-<span class="text-muted">&mdash;</span>
+<p class="mb-2 text-muted"><strong>Current:</strong> &mdash;</p>
+{% endif %}
+
+{% if can_change_function_code %}
+<form action="{{ set_function_code_url }}" method="post" class="form-horizontal">
+    {% csrf_token %}
+    <div class="mb-3">
+        {{ panel_form.function_code.label_tag }}
+        {{ panel_form.function_code }}
+        {% if panel_form.function_code.help_text %}
+        <div class="form-text">{{ panel_form.function_code.help_text }}</div>
+        {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Update Function Code</button>
+</form>
 {% endif %}

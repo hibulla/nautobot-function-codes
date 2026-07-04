@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load helpers %}
+
+{% block title %}Function Code Coverage{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>Function Code Coverage</h1>
+        <p class="text-muted">Overview of Function Code assignments across all devices.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Devices</h5>
+                <p class="display-6 mb-0">{{ stats.total_devices }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Assigned</h5>
+                <p class="display-6 mb-0">{{ stats.assigned_devices }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Unassigned</h5>
+                <p class="display-6 mb-0">
+                    {% if stats.unassigned_devices %}
+                    <a href="{{ stats.unassigned_devices_url }}">{{ stats.unassigned_devices }}</a>
+                    {% else %}
+                    {{ stats.unassigned_devices }}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Assignments by Function Code</strong>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Function Code</th>
+                            <th>Devices</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in stats.function_code_rows %}
+                        <tr>
+                            <td>
+                                <a href="{{ row.function_code.get_absolute_url }}">{{ row.function_code.name }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ row.assignments_url }}" class="badge bg-primary">{{ row.device_count }}</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-muted">No Function Codes defined.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

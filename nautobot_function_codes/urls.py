@@ -16,10 +16,17 @@ router.register("device-assignments", views.DeviceFunctionCodeAssignmentUIViewSe
 
 urlpatterns = [
     path("docs/", RedirectView.as_view(url=static("nautobot_function_codes/docs/index.html")), name="docs"),
+    path("coverage/", views.CoverageDashboardView.as_view(), name="coverage_dashboard"),
+    path("import-assignments/", views.ImportAssignmentsView.as_view(), name="import_assignments"),
     path(
         "function-codes/<uuid:pk>/assign-devices/",
         views.FunctionCodeAssignDevicesView.as_view(),
         name="functioncode_assign_devices",
+    ),
+    path(
+        "devices/<uuid:pk>/function-code/",
+        views.DeviceSetFunctionCodeView.as_view(),
+        name="device_set_function_code",
     ),
 ]
 

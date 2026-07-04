@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load form_helpers %}
+
+{% block title %}Import Device Assignments{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>Import Device Assignments</h1>
+        <p class="text-muted">
+            Upload a CSV file with columns <code>device</code> and <code>function_code</code>.
+            Use the device name or UUID. Leave <code>function_code</code> empty to clear an assignment.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" class="form">
+            {% csrf_token %}
+            {% render_form form %}
+            <button type="submit" class="btn btn-primary">Import</button>
+        </form>
+    </div>
+</div>
+
+{% if result %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <strong>Import Results</strong>
+            </div>
+            <div class="card-body">
+                <p>{{ result.summary }}</p>
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>Row</th>
+                            <th>Device</th>
+                            <th>Function Code</th>
+                            <th>Status</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in result.rows %}
+                        <tr>
+                            <td>{{ row.row_number }}</td>
+                            <td>{{ row.device_name }}</td>
+                            <td>{{ row.function_code_slug|default:"—" }}</td>
+                            <td>{{ row.status }}</td>
+                            <td>{{ row.message }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-muted">No rows processed.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

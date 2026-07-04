@@ -25,6 +25,16 @@ function_code_items = (
             ),
         ),
     ),
+    NavMenuItem(
+        link="plugins:nautobot_function_codes:coverage_dashboard",
+        name="Coverage",
+        permissions=["nautobot_function_codes.view_functioncode"],
+    ),
+    NavMenuItem(
+        link="plugins:nautobot_function_codes:import_assignments",
+        name="Import Assignments",
+        permissions=["nautobot_function_codes.change_functioncode"],
+    ),
 )
 
 menu_items = (

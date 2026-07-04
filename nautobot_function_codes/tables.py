@@ -5,7 +5,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.http import urlencode
-from nautobot.apps.tables import BaseTable, BooleanColumn, ButtonsColumn, ColorColumn, LinkedCountColumn, ToggleColumn
+from nautobot.apps.tables import BaseTable, BooleanColumn, ButtonsColumn, LinkedCountColumn, ToggleColumn
 from nautobot.apps.ui import ObjectsTablePanel
 from nautobot.core.templatetags import helpers
 
@@ -33,7 +33,6 @@ class FunctionCodeTable(BaseTable):
     pk = ToggleColumn()
     name = tables.Column(linkify=True)
     description = tables.Column()
-    color = ColorColumn()
     is_active = BooleanColumn()
     device_count = DeviceAssignmentCountColumn(
         viewname="plugins:nautobot_function_codes:devicefunctioncodeassignment_list",
@@ -50,7 +49,6 @@ class FunctionCodeTable(BaseTable):
             "pk",
             "name",
             "description",
-            "color",
             "is_active",
             "device_count",
             "actions",
@@ -59,7 +57,6 @@ class FunctionCodeTable(BaseTable):
             "pk",
             "name",
             "description",
-            "color",
             "is_active",
             "device_count",
             "actions",

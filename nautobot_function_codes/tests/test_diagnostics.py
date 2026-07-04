@@ -23,6 +23,8 @@ class PluginDiagnosticsTest(TestCase):
 
         self.assertEqual(checks["plugin_models"].status, "ok")
         self.assertEqual(checks["assignment_ui_routes"].status, "ok")
+        self.assertEqual(checks["extended_ui_routes"].status, "ok")
+        self.assertEqual(checks["plugin_jobs"].status, "ok")
         self.assertEqual(
             checks["assignment_list_http"].status,
             "ok",

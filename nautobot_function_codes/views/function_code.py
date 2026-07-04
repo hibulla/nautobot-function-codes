@@ -38,7 +38,6 @@ class FunctionCodeUIViewSet(NautobotUIViewSet):
                     "name",
                     "slug",
                     "description",
-                    "color",
                     "is_active",
                     "created",
                     "last_updated",
