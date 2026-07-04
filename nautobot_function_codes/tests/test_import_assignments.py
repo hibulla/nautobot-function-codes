@@ -2,7 +2,6 @@
 
 import io
 
-from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from nautobot.apps.testing import TestCase
@@ -16,6 +15,12 @@ from nautobot_function_codes.utils import get_device_function_code
 class ImportAssignmentsServiceTest(TestCase):
     """Test CSV import service logic."""
 
+    user_permissions = (
+        "dcim.view_device",
+        "dcim.change_device",
+        "nautobot_function_codes.view_functioncode",
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.function_code = fixtures.create_functioncode_with(name="ACC", slug="acc-import")
@@ -23,10 +28,6 @@ class ImportAssignmentsServiceTest(TestCase):
         cls.inactive_code = fixtures.create_functioncode_with(name="OLD", slug="old-import", is_active=False)
         cls.device = create_test_device(name="import-device-1")
         cls.other_device = create_test_device(name="import-device-2")
-        user_model = get_user_model()
-        if not user_model.objects.filter(is_superuser=True).exists():
-            user_model.objects.create_superuser("import-user", "import-user@example.com", "password")
-        cls.user = user_model.objects.filter(is_superuser=True).first()
 
     def _csv(self, content):
         """Return CSV content as an in-memory text stream."""
@@ -64,17 +65,17 @@ class ImportAssignmentsServiceTest(TestCase):
 class ImportAssignmentsViewTest(TestCase):
     """HTTP tests for the import assignments view."""
 
+    user_permissions = (
+        "nautobot_function_codes.change_functioncode",
+        "dcim.view_device",
+        "dcim.change_device",
+        "nautobot_function_codes.view_functioncode",
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.function_code = fixtures.create_functioncode_with(name="COR", slug="cor-import-view")
         cls.device = create_test_device(name="import-view-device")
-        user_model = get_user_model()
-        if not user_model.objects.filter(is_superuser=True).exists():
-            user_model.objects.create_superuser("import-view", "import-view@example.com", "password")
-        cls.user = user_model.objects.filter(is_superuser=True).first()
-
-    def setUp(self):
-        self.client.force_login(self.user)
 
     def test_import_view_get_returns_200(self):
         url = reverse("plugins:nautobot_function_codes:import_assignments")

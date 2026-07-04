@@ -61,6 +61,11 @@ class DeviceFunctionCodeAssignmentAPIViewTest(APIViewTestCases.APIViewTestCase):
             fixtures.create_functioncode_with(name="DIS", slug="dis-api"),
             fixtures.create_functioncode_with(name="ACC", slug="acc-api"),
         ]
+        cls.inactive_function_code = fixtures.create_functioncode_with(
+            name="API-OLD",
+            slug="api-old",
+            is_active=False,
+        )
         cls.devices = [
             create_test_device(name="api-device-1"),
             create_test_device(name="api-device-2"),
@@ -91,3 +96,18 @@ class DeviceFunctionCodeAssignmentAPIViewTest(APIViewTestCases.APIViewTestCase):
         cls.update_data = {
             "function_code": cls.function_codes[0].pk,
         }
+
+    def test_create_rejects_inactive_function_code(self):
+        device = create_test_device(name="api-inactive-device")
+        self.assertHttpStatus(
+            self.client.post(
+                self._get_list_url(),
+                {
+                    "device": device.pk,
+                    "function_code": self.inactive_function_code.pk,
+                },
+                format="json",
+                **self.header,
+            ),
+            400,
+        )

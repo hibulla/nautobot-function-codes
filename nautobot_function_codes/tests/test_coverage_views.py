@@ -1,6 +1,5 @@
 """Tests for the coverage dashboard."""
 
-from django.contrib.auth import get_user_model
 from django.urls import reverse
 from nautobot.apps.testing import TestCase
 
@@ -13,6 +12,12 @@ from nautobot_function_codes.utils import set_device_function_code
 
 class CoverageServiceTest(TestCase):
     """Test coverage statistics helpers."""
+
+    user_permissions = (
+        "dcim.view_device",
+        "nautobot_function_codes.view_functioncode",
+        "nautobot_function_codes.view_devicefunctioncodeassignment",
+    )
 
     @classmethod
     def setUpTestData(cls):
@@ -30,10 +35,6 @@ class CoverageServiceTest(TestCase):
             device=cls.inactive_device,
             function_code=cls.inactive_code,
         )
-        user_model = get_user_model()
-        if not user_model.objects.filter(is_superuser=True).exists():
-            user_model.objects.create_superuser("coverage-user", "coverage-user@example.com", "password")
-        cls.user = user_model.objects.filter(is_superuser=True).first()
 
     def test_get_coverage_stats_counts_devices(self):
         stats = get_coverage_stats(self.user)
@@ -53,16 +54,11 @@ class CoverageServiceTest(TestCase):
 class CoverageDashboardViewTest(TestCase):
     """HTTP tests for the coverage dashboard."""
 
+    user_permissions = ("nautobot_function_codes.view_functioncode",)
+
     @classmethod
     def setUpTestData(cls):
         cls.function_code = fixtures.create_functioncode_with(name="DIS", slug="dis-dashboard")
-        user_model = get_user_model()
-        if not user_model.objects.filter(is_superuser=True).exists():
-            user_model.objects.create_superuser("coverage-view", "coverage-view@example.com", "password")
-        cls.user = user_model.objects.filter(is_superuser=True).first()
-
-    def setUp(self):
-        self.client.force_login(self.user)
 
     def test_coverage_dashboard_returns_200(self):
         url = reverse("plugins:nautobot_function_codes:coverage_dashboard")
