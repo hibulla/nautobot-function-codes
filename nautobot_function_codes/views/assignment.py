@@ -46,6 +46,18 @@ class DeviceFunctionCodeAssignmentUIViewSet(NautobotUIViewSet):
     serializer_class = serializers.DeviceFunctionCodeAssignmentSerializer
     table_class = tables.DeviceFunctionCodeAssignmentTable
 
+    def send_bulk_edit_objects_to_job(self, request, form_data):
+        """Apply bulk edit synchronously instead of enqueueing a Celery job."""
+        model = self.get_queryset().model
+        edit_all = bool(request.POST.get("_all"))
+        form = self.get_form_class()(model, request.POST, edit_all=edit_all)
+        restrict_form_fields(form, request.user)
+        if not form.is_valid():
+            return self.form_invalid(form)
+
+        self._process_bulk_update_form(form)
+        return redirect(self.get_return_url(request))
+
     def perform_create(self, request, *args, **kwargs):
         """Create assignments in bulk instead of one device at a time."""
         form_class = self.get_form_class()
