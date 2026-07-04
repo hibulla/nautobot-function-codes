@@ -98,6 +98,7 @@ class DeviceFunctionCodeAssignmentAPIViewTest(APIViewTestCases.APIViewTestCase):
         }
 
     def test_create_rejects_inactive_function_code(self):
+        self.add_permissions("nautobot_function_codes.add_devicefunctioncodeassignment")
         device = create_test_device(name="api-inactive-device")
         self.assertHttpStatus(
             self.client.post(

@@ -1,5 +1,6 @@
 """Nautobot jobs for Function Code assignment management."""
 
+from nautobot.apps.jobs import register_jobs
 from nautobot.extras.jobs import BooleanVar, FileVar, Job
 
 from nautobot_function_codes.services.coverage import get_audit_report
@@ -68,3 +69,4 @@ class ImportFunctionCodeAssignments(Job):
 
 
 jobs = [AuditFunctionCodeAssignments, ImportFunctionCodeAssignments]
+register_jobs(*jobs)

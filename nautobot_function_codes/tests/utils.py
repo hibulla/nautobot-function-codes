@@ -1,8 +1,17 @@
 """Shared helpers for plugin tests."""
 
 from django.contrib.contenttypes.models import ContentType
+from nautobot.apps.utils import refresh_job_model_from_job_class
+from nautobot.core.celery import register_jobs
 from nautobot.dcim.models import Device, DeviceType, Location, LocationType, Manufacturer
-from nautobot.extras.models import Role, Status
+from nautobot.extras.models import Job, JobQueue, Role, Status
+
+
+def get_test_job_model(job_class):
+    """Ensure a Job class is registered and has a corresponding Job model row."""
+    register_jobs(job_class)
+    job_model, _ = refresh_job_model_from_job_class(Job, job_class, JobQueue)
+    return job_model
 
 
 def create_test_device(name="test-device"):

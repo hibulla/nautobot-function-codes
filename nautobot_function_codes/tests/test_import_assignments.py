@@ -9,7 +9,7 @@ from nautobot.apps.testing import TestCase
 from nautobot_function_codes.services.import_assignments import import_assignments_from_csv
 from nautobot_function_codes.tests import fixtures
 from nautobot_function_codes.tests.utils import create_test_device
-from nautobot_function_codes.utils import get_device_function_code
+from nautobot_function_codes.utils import get_device_function_code, set_device_function_code
 
 
 class ImportAssignmentsServiceTest(TestCase):
@@ -34,6 +34,7 @@ class ImportAssignmentsServiceTest(TestCase):
         return io.StringIO(content)
 
     def test_import_assigns_and_clears_devices(self):
+        set_device_function_code(self.other_device, self.other_function_code)
         csv_data = "device,function_code\n" f"{self.device.name},acc-import\n" f"{self.other_device.name},\n"
         result = import_assignments_from_csv(self._csv(csv_data), self.user)
         self.assertEqual(result.updated, 1)
