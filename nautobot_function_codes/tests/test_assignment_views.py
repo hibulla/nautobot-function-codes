@@ -5,6 +5,7 @@ from django.urls import reverse
 from nautobot.apps.testing import TestCase
 
 from nautobot_function_codes import models
+from nautobot_function_codes.forms.assignment import DeviceFunctionCodeAssignmentBulkEditForm
 from nautobot_function_codes.tests import fixtures
 from nautobot_function_codes.tests.utils import create_test_device
 from nautobot_function_codes.utils import get_device_function_code
@@ -88,6 +89,20 @@ class DeviceAssignmentViewTest(TestCase):
         self.assertEqual(get_device_function_code(self.devices[0]), self.function_code)
         self.assertEqual(get_device_function_code(self.devices[1]), self.function_code)
         self.assertIsNone(get_device_function_code(self.devices[2]))
+
+    def test_assignment_bulk_edit_form_validates(self):
+        assignment = models.DeviceFunctionCodeAssignment.objects.create(
+            device=self.devices[0],
+            function_code=self.function_code,
+        )
+        form = DeviceFunctionCodeAssignmentBulkEditForm(
+            models.DeviceFunctionCodeAssignment,
+            {
+                "pk": [str(assignment.pk)],
+                "function_code": str(self.other_function_code.pk),
+            },
+        )
+        self.assertTrue(form.is_valid(), form.errors)
 
     def test_function_code_detail_shows_assigned_devices_panel(self):
         models.DeviceFunctionCodeAssignment.objects.create(

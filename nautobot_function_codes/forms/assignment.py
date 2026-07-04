@@ -2,11 +2,12 @@
 
 from django import forms
 from nautobot.apps.forms import (
+    BootstrapMixin,
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
-    NautobotBulkEditForm,
     NautobotFilterForm,
 )
+from nautobot.core.forms import BulkEditForm
 from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
@@ -27,7 +28,7 @@ class DeviceFunctionCodeAssignmentForm(forms.ModelForm):
         fields = ["device", "function_code"]
 
 
-class DeviceFunctionCodeAssignmentBulkEditForm(NautobotBulkEditForm):
+class DeviceFunctionCodeAssignmentBulkEditForm(BootstrapMixin, BulkEditForm):
     """Bulk update Function Code assignments."""
 
     pk = forms.ModelMultipleChoiceField(
