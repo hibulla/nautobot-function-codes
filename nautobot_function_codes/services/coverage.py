@@ -40,6 +40,7 @@ class AuditReport:
 
 
 def _device_queryset(user):
+    """Return devices visible to the user."""
     return Device.objects.restrict(user, "view")
 
 

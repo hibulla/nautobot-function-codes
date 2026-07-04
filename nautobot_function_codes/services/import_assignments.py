@@ -48,6 +48,7 @@ class ImportAssignmentsResult:
 
 
 def _parse_csv(text):
+    """Parse CSV text into row tuples of line number, device, and function code."""
     reader = csv.DictReader(io.StringIO(text))
     if not reader.fieldnames:
         raise ValueError("CSV file is missing a header row.")
@@ -67,6 +68,7 @@ def _parse_csv(text):
 
 
 def _resolve_device(device_value, user):
+    """Look up a device by UUID or name within the user's permissions."""
     devices = Device.objects.restrict(user, "change")
     try:
         device_uuid = uuid.UUID(device_value)
@@ -82,6 +84,7 @@ def _resolve_device(device_value, user):
 
 
 def _resolve_function_code(function_code_value, user):
+    """Look up an active Function Code by slug or name within the user's permissions."""
     if not function_code_value:
         return None
 

@@ -29,6 +29,7 @@ class ImportAssignmentsServiceTest(TestCase):
         cls.user = user_model.objects.filter(is_superuser=True).first()
 
     def _csv(self, content):
+        """Return CSV content as an in-memory text stream."""
         return io.StringIO(content)
 
     def test_import_assigns_and_clears_devices(self):
