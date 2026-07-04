@@ -95,7 +95,7 @@ class DeviceAssignmentViewTest(TestCase):
             device=self.devices[0],
             function_code=self.function_code,
         )
-        url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_bulk_update")
+        url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_bulk_edit")
         response = self.client.post(
             url,
             {
