@@ -73,9 +73,7 @@ def get_coverage_stats(user):
         for function_code in function_codes
     ]
 
-    unassigned_devices_url = (
-        reverse("dcim:device_list") + "?nautobot_function_codes_has_function_code=false"
-    )
+    unassigned_devices_url = reverse("dcim:device_list") + "?nautobot_function_codes_has_function_code=false"
 
     return CoverageStats(
         total_devices=total_devices,
@@ -96,9 +94,7 @@ def get_audit_report(user, *, include_inactive=True):
     ]
 
     unassigned_devices = (
-        _device_queryset(user)
-        .filter(function_code_assignment__function_code__isnull=True)
-        .order_by("name")[:50]
+        _device_queryset(user).filter(function_code_assignment__function_code__isnull=True).order_by("name")[:50]
     )
     for device in unassigned_devices:
         log_lines.append(f"Unassigned device: {device.name} ({device.pk})")
@@ -121,9 +117,7 @@ def get_audit_report(user, *, include_inactive=True):
         )
         log_lines.append(f"Assignments to inactive Function Codes: {inactive_assignment_count}")
         for assignment in inactive_assignments:
-            log_lines.append(
-                f"Inactive assignment: {assignment.device.name} -> {assignment.function_code.slug}"
-            )
+            log_lines.append(f"Inactive assignment: {assignment.device.name} -> {assignment.function_code.slug}")
         if inactive_assignment_count > inactive_assignments.count():
             remaining = inactive_assignment_count - inactive_assignments.count()
             log_lines.append(f"... and {remaining} more inactive assignment(s)")

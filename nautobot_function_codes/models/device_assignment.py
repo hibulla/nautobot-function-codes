@@ -40,4 +40,3 @@ class DeviceFunctionCodeAssignment(BaseModel):
         """Validate assignment fields."""
         super().clean()
         validate_function_code_for_assignment(self.function_code)
-

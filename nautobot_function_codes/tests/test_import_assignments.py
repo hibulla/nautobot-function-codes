@@ -32,11 +32,7 @@ class ImportAssignmentsServiceTest(TestCase):
         return io.StringIO(content)
 
     def test_import_assigns_and_clears_devices(self):
-        csv_data = (
-            "device,function_code\n"
-            f"{self.device.name},acc-import\n"
-            f"{self.other_device.name},\n"
-        )
+        csv_data = "device,function_code\n" f"{self.device.name},acc-import\n" f"{self.other_device.name},\n"
         result = import_assignments_from_csv(self._csv(csv_data), self.user)
         self.assertEqual(result.updated, 1)
         self.assertEqual(result.cleared, 1)

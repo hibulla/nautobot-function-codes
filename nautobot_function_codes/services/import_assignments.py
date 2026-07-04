@@ -43,8 +43,7 @@ class ImportAssignmentsResult:
         """Return a human-readable summary."""
         prefix = "Dry run: " if self.dry_run else ""
         return (
-            f"{prefix}updated={self.updated}, cleared={self.cleared}, "
-            f"skipped={self.skipped}, errors={self.errors}"
+            f"{prefix}updated={self.updated}, cleared={self.cleared}, " f"skipped={self.skipped}, errors={self.errors}"
         )
 
 

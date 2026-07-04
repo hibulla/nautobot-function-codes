@@ -56,12 +56,8 @@ class DeviceFunctionCodeIntegrationTest(TestCase):
 
     def test_device_has_function_code_filter(self):
         set_device_function_code(self.device, self.function_code)
-        assigned = Device.objects.filter(
-            **{"function_code_assignment__function_code__isnull": False}
-        )
-        unassigned = Device.objects.filter(
-            **{"function_code_assignment__function_code__isnull": True}
-        )
+        assigned = Device.objects.filter(**{"function_code_assignment__function_code__isnull": False})
+        unassigned = Device.objects.filter(**{"function_code_assignment__function_code__isnull": True})
         self.assertIn(self.device, assigned)
         self.assertIn(self.other_device, unassigned)
 

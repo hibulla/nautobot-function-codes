@@ -105,7 +105,9 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
         """Render the bulk assignment form."""
         function_code = get_object_or_404(self.queryset, pk=pk)
         if not function_code.is_active:
-            messages.error(request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments.")
+            messages.error(
+                request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments."
+            )
             return redirect(function_code.get_absolute_url())
 
         return render(
@@ -124,7 +126,9 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
         return_url = self.get_return_url(request, obj=function_code)
 
         if not function_code.is_active:
-            messages.error(request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments.")
+            messages.error(
+                request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments."
+            )
             return redirect(return_url)
 
         form = FunctionCodeAssignDevicesForm(request.POST)
