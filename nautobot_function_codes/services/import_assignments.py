@@ -5,11 +5,13 @@ import io
 import uuid
 from dataclasses import dataclass, field
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
 from nautobot_function_codes.utils import set_device_function_code
+from nautobot_function_codes.validators import validate_function_code_for_assignment
 
 REQUIRED_COLUMNS = ("device", "function_code")
 
@@ -90,8 +92,15 @@ def _resolve_function_code(function_code_value, user):
         function_code = function_codes.filter(name=function_code_value).first()
     if function_code is None:
         raise ValueError(f"Function Code '{function_code_value}' was not found.")
-    if not function_code.is_active:
-        raise ValueError(f"Function Code '{function_code.slug}' is inactive.")
+
+    try:
+        validate_function_code_for_assignment(function_code)
+    except ValidationError as exc:
+        message = exc.message_dict.get("function_code", exc.messages)
+        if isinstance(message, list):
+            message = message[0]
+        raise ValueError(message) from exc
+
     return function_code
 
 

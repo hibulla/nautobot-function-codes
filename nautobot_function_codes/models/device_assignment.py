@@ -3,6 +3,8 @@
 from django.db import models
 from nautobot.apps.models import BaseModel
 
+from nautobot_function_codes.validators import validate_function_code_for_assignment
+
 
 class DeviceFunctionCodeAssignment(BaseModel):
     """Extension record linking a Device to its Function Code."""
@@ -33,3 +35,9 @@ class DeviceFunctionCodeAssignment(BaseModel):
         if self.function_code:
             return f"{self.device}: {self.function_code}"
         return f"{self.device}: (none)"
+
+    def clean(self):
+        """Validate assignment fields."""
+        super().clean()
+        validate_function_code_for_assignment(self.function_code)
+

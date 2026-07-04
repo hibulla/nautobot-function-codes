@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from nautobot.apps.testing import TestCase
 
+from nautobot_function_codes import models
 from nautobot_function_codes.services.coverage import get_audit_report, get_coverage_stats
 from nautobot_function_codes.tests import fixtures
 from nautobot_function_codes.tests.utils import create_test_device
@@ -25,7 +26,10 @@ class CoverageServiceTest(TestCase):
         cls.unassigned_device = create_test_device(name="coverage-unassigned")
         cls.inactive_device = create_test_device(name="coverage-inactive")
         set_device_function_code(cls.assigned_device, cls.function_code)
-        set_device_function_code(cls.inactive_device, cls.inactive_code)
+        models.DeviceFunctionCodeAssignment.objects.create(
+            device=cls.inactive_device,
+            function_code=cls.inactive_code,
+        )
         user_model = get_user_model()
         if not user_model.objects.filter(is_superuser=True).exists():
             user_model.objects.create_superuser("coverage-user", "coverage-user@example.com", "password")

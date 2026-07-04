@@ -4,6 +4,7 @@ from django.db import transaction
 
 from nautobot_function_codes.debug_utils import debug_log
 from nautobot_function_codes.models import DeviceFunctionCodeAssignment, FunctionCode
+from nautobot_function_codes.validators import validate_function_code_for_assignment
 
 
 def get_device_function_code(device):
@@ -31,6 +32,8 @@ def set_device_function_code(device, function_code):
 
     if function_code is not None and not isinstance(function_code, FunctionCode):
         raise TypeError("function_code must be a FunctionCode instance or None")
+
+    validate_function_code_for_assignment(function_code)
 
     assignment, created = DeviceFunctionCodeAssignment.objects.get_or_create(device=device)
     assignment.function_code = function_code

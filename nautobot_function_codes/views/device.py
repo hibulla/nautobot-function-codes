@@ -1,6 +1,7 @@
 """Views for updating Function Code from Device detail."""
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from nautobot.core.forms import restrict_form_fields
@@ -32,7 +33,14 @@ class DeviceSetFunctionCodeView(ObjectPermissionRequiredMixin, View):
 
         function_code = form.cleaned_data["function_code"]
         previous_function_code = get_device_function_code(device)
-        set_device_function_code(device, function_code)
+        try:
+            set_device_function_code(device, function_code)
+        except ValidationError as exc:
+            message = exc.message_dict.get("function_code", exc.messages)
+            if isinstance(message, list):
+                message = message[0]
+            messages.error(request, message)
+            return redirect(device.get_absolute_url())
 
         if function_code is None:
             if previous_function_code is None:

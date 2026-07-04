@@ -21,6 +21,12 @@ _DEVICES_FIELD_HELP_TEXT = (
 class DeviceFunctionCodeAssignmentForm(forms.ModelForm):
     """Edit an existing Device Function Code assignment."""
 
+    function_code = DynamicModelChoiceField(
+        queryset=models.FunctionCode.objects.filter(is_active=True),
+        required=False,
+        label="Function Code",
+    )
+
     class Meta:
         """Meta attributes."""
 

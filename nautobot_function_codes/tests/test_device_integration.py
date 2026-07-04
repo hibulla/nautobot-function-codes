@@ -1,6 +1,7 @@
 """Device integration tests."""
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from nautobot.apps.testing import TestCase
 from nautobot.dcim.models import Device
@@ -88,3 +89,14 @@ class DeviceFunctionCodeIntegrationTest(TestCase):
         device_pk = self.device.pk
         self.device.delete()
         self.assertFalse(models.DeviceFunctionCodeAssignment.objects.filter(device_id=device_pk).exists())
+
+    def test_set_device_function_code_rejects_inactive_function_code(self):
+        inactive_code = fixtures.create_functioncode_with(name="OLD", slug="old-inactive", is_active=False)
+        with self.assertRaises(ValidationError):
+            set_device_function_code(self.device, inactive_code)
+
+    def test_assignment_model_clean_rejects_inactive_function_code(self):
+        inactive_code = fixtures.create_functioncode_with(name="RET", slug="ret-inactive", is_active=False)
+        assignment = models.DeviceFunctionCodeAssignment(device=self.device, function_code=inactive_code)
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()

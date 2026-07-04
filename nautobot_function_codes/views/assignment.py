@@ -1,6 +1,7 @@
 """Views for Device Function Code assignments."""
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views import View
@@ -25,11 +26,20 @@ ASSIGN_DEVICES_TEMPLATE = "nautobot_function_codes/assign_devices.html"
 
 def _assign_devices_and_message(request, function_code, devices):
     """Assign devices to a Function Code and add a success message."""
-    assign_devices_to_function_code(function_code, devices)
+    try:
+        assign_devices_to_function_code(function_code, devices)
+    except ValidationError as exc:
+        message = exc.message_dict.get("function_code", exc.messages)
+        if isinstance(message, list):
+            message = message[0]
+        messages.error(request, message)
+        return False
+
     messages.success(
         request,
         f"Assigned {len(devices)} device(s) to Function Code {function_code.name}.",
     )
+    return True
 
 
 class DeviceFunctionCodeAssignmentUIViewSet(NautobotUIViewSet):
@@ -72,7 +82,8 @@ class DeviceFunctionCodeAssignmentUIViewSet(NautobotUIViewSet):
 
         function_code = form.cleaned_data["function_code"]
         devices = form.cleaned_data["devices"]
-        _assign_devices_and_message(request, function_code, devices)
+        if not _assign_devices_and_message(request, function_code, devices):
+            return self.form_invalid(form)
 
         return_url = self.get_return_url(request)
         if not return_url:
@@ -92,7 +103,11 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
 
     def get(self, request, pk):
         """Render the bulk assignment form."""
-        function_code = get_object_or_404(models.FunctionCode, pk=pk)
+        function_code = get_object_or_404(self.queryset, pk=pk)
+        if not function_code.is_active:
+            messages.error(request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments.")
+            return redirect(function_code.get_absolute_url())
+
         return render(
             request,
             self.template_name,
@@ -105,9 +120,14 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
 
     def post(self, request, pk):
         """Assign the selected devices to the Function Code."""
-        function_code = get_object_or_404(models.FunctionCode, pk=pk)
-        form = FunctionCodeAssignDevicesForm(request.POST)
+        function_code = get_object_or_404(self.queryset, pk=pk)
         return_url = self.get_return_url(request, obj=function_code)
+
+        if not function_code.is_active:
+            messages.error(request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments.")
+            return redirect(return_url)
+
+        form = FunctionCodeAssignDevicesForm(request.POST)
 
         if not form.is_valid():
             return render(
