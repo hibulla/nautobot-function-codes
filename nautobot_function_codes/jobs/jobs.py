@@ -27,6 +27,7 @@ class AuditFunctionCodeAssignments(Job):
         report = get_audit_report(self.user, include_inactive=include_inactive_codes)
         for line in report.log_lines:
             self.logger.info(line)
+        self.logger.info(report.summary)
         return report.summary
 
 

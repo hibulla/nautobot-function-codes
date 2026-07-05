@@ -2,19 +2,41 @@
 
 A Nautobot plugin for managing reusable Function Codes and assigning them to devices.
 
+Documentation: [docs.nautobot.com/projects/function-codes](https://docs.nautobot.com/projects/function-codes/en/latest/)
+
 ## Features
 
-- Create and manage Function Codes (name, slug, description, active status)
-- Assign devices to Function Codes via bulk Assign Devices (from Function Code detail or Device Assignments)
-- Device Assignments list for view, edit, bulk edit, and delete
-- Function Code column on the Device list and editable panel on Device detail pages
-- Coverage dashboard with assignment statistics and links to unassigned devices
-- Synchronous CSV import of device assignments from the plugin UI
-- Nautobot Jobs for assignment audit and CSV import (requires Celery worker)
+### Function Codes
+
+- Create and manage Function Codes (`name`, `slug`, `description`, `is_active`)
 - REST API and GraphQL support
 - Global and list search, filtering, and CSV import/export
 - Object permissions, changelog, notes, custom fields, relationships, custom links, and webhooks
-- Device list filtering by Function Code and by whether a device has a Function Code assigned
+
+### Device assignments
+
+- One Function Code per device (via `DeviceFunctionCodeAssignment`)
+- Assign devices in bulk from Function Code detail or Device Assignments
+- Device Assignments list with view, edit, bulk edit, and delete
+- Function Code column on the Device list
+- Editable Function Code panel on Device detail pages
+- Validation prevents assigning inactive Function Codes
+
+### Coverage and import
+
+- Coverage dashboard with assignment statistics and links to unassigned devices
+- Synchronous CSV import from **Function Codes → Import Assignments** (no Celery required)
+- Nautobot Jobs for scheduled or background audit and CSV import (requires Celery worker)
+
+### Filtering
+
+- Filter Device list by Function Code
+- Filter Device list by whether a device has a Function Code assigned (`Has Function Code`)
+
+## Requirements
+
+- Nautobot 3.1.0 or higher
+- Python 3.12 or higher
 
 ## Installation
 
@@ -36,9 +58,9 @@ nautobot-server migrate nautobot_function_codes
 
 ## Compatibility
 
-| Nautobot | Plugin |
-|----------|--------|
-| 3.1.x    | 0.2.x  |
+| Nautobot | Plugin | Python |
+|----------|--------|--------|
+| 3.1.x    | 0.2.x  | 3.12+  |
 
 ## Development
 
@@ -51,21 +73,41 @@ invoke start
 invoke unittest
 ```
 
+Other useful commands:
+
+```bash
+invoke pylint
+invoke ruff
+invoke build
+```
+
 ## Managing Device Assignments
 
-Device assignments are managed from the **Function Codes** plugin UI:
+Device assignments are managed from the **Function Codes** plugin menu:
 
-1. **Function Code detail → Assign Devices** — assign many devices to that Function Code
-2. **Function Codes → Device Assignments → Add** — same bulk form with Function Code and Devices fields
-3. **Function Codes → Device Assignments** — list, edit, bulk edit, and delete existing assignments
-4. **Function Code detail → Assigned Devices** — view devices already linked to a Function Code
-5. **Device detail → Function Code** — view or update the assignment for a single device
-6. **Function Codes → Coverage** — review assignment coverage and open unassigned devices
-7. **Function Codes → Import Assignments** — upload a CSV file and apply assignments synchronously
+1. **Function Codes → Function Codes** — create and manage Function Code records
+2. **Function Code detail → Assign Devices** — assign many devices to one Function Code
+3. **Function Codes → Device Assignments → Add** — bulk form with Function Code and Devices fields
+4. **Function Codes → Device Assignments** — list, edit, bulk edit, and delete assignments
+5. **Function Code detail → Assigned Devices** — view devices linked to a Function Code
+6. **Device detail → Function Code** — view or update the assignment for a single device
+7. **Function Codes → Coverage** — review assignment coverage and open unassigned devices
+8. **Function Codes → Import Assignments** — upload a CSV file and apply assignments synchronously
 
-The REST API endpoint `/api/plugins/function-codes/device-assignments/` is also available for automation.
+### REST API
 
-### CSV Import
+| Endpoint | Description |
+|----------|-------------|
+| `/api/plugins/function-codes/function-codes/` | Function Code CRUD |
+| `/api/plugins/function-codes/device-assignments/` | Device assignment CRUD |
+
+Device list filtering examples:
+
+- `?nautobot_function_codes_function_code=acc` — devices with Function Code slug `acc`
+- `?nautobot_function_codes_has_function_code=true` — devices with any Function Code assigned
+- `?nautobot_function_codes_has_function_code=false` — devices without a Function Code
+
+### CSV import format
 
 Required columns:
 
@@ -75,16 +117,18 @@ switch-01,acc
 switch-02,
 ```
 
-Use the device name or UUID. Leave `function_code` empty to clear an assignment.
+Use the device name or UUID. Leave `function_code` empty to clear an assignment. Inactive Function Codes are rejected.
+
+The same format is used by both **Import Assignments** (UI) and the **Import Function Code Assignments** job.
 
 ### Jobs
 
 The plugin registers two Nautobot Jobs:
 
-- **Audit Function Code Assignments** — report unassigned devices and inactive assignments
+- **Audit Function Code Assignments** — report unassigned devices and assignments to inactive Function Codes
 - **Import Function Code Assignments** — import assignments from CSV via the job engine
 
-These jobs require a running Celery worker. The Coverage dashboard and Import Assignments UI work without Celery.
+Jobs require a running Celery worker. The Coverage dashboard and Import Assignments UI work without Celery.
 
 Run diagnostics after deployment:
 

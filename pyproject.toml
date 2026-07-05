@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nautobot-function-codes"
-version = "0.1.0a0"
+version = "0.2.0"
 description = "A Nautobot plugin for managing reusable Function Codes."
 authors = ["Bartek <dev@example.com>"]
 license = "Apache-2.0"
