@@ -22,12 +22,12 @@ class FunctionCodeJobsTest(TransactionTestCase):
         "nautobot_function_codes.view_functioncode",
     )
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
+        super().setUp()
         for job_class in jobs_module.jobs:
             get_test_job_model(job_class)
-        cls.function_code = fixtures.create_functioncode_with(name="ACC", slug="acc-jobs")
-        cls.device = create_test_device(name="jobs-device")
+        self.function_code = fixtures.create_functioncode_with(name="ACC", slug="acc-jobs")
+        self.device = create_test_device(name="jobs-device")
 
     def test_audit_job_runs_successfully(self):
         set_device_function_code(self.device, self.function_code)
