@@ -8,7 +8,7 @@ from nautobot.apps.ui import (
     NavMenuTab,
 )
 
-FUNCTION_CODES_TAB_ICON = "nautobot_function_codes/icons/tag-multiple.svg"
+FUNCTION_CODES_TAB_ICON = "transform"
 
 VIEW_FUNCTION_CODE = "nautobot_function_codes.view_functioncode"
 VIEW_DEVICE_ASSIGNMENT = "nautobot_function_codes.view_devicefunctioncodeassignment"
