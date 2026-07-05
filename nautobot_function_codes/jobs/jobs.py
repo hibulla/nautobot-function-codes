@@ -22,9 +22,9 @@ class AuditFunctionCodeAssignments(Job):
         description = "Report devices without Function Codes and inactive assignments."
         has_sensitive_variables = False
 
-    def run(self):
+    def run(self, *, include_inactive_codes):
         """Generate and log the audit report."""
-        report = get_audit_report(self.user, include_inactive=self.include_inactive_codes)
+        report = get_audit_report(self.user, include_inactive=include_inactive_codes)
         for line in report.log_lines:
             self.logger.info(line)
         return report.summary
@@ -43,10 +43,10 @@ class ImportFunctionCodeAssignments(Job):
         description = "Import device Function Code assignments from a CSV file."
         has_sensitive_variables = False
 
-    def run(self):
+    def run(self, *, csv_file, dry_run):
         """Process the uploaded CSV file."""
         try:
-            result = import_assignments_from_csv(self.csv_file, self.user, dry_run=self.dry_run)
+            result = import_assignments_from_csv(csv_file, self.user, dry_run=dry_run)
         except ValueError as exc:
             self.logger.error(str(exc))
             raise
