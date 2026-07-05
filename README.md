@@ -140,6 +140,11 @@ nautobot-server diagnose_nautobot_function_codes
 
 Function Codes use Nautobot's `OrganizationalModel` base class (similar to Roles and Platforms). Tags are supported on `Device` objects, not on Function Code records.
 
+## About
+
+This plugin is created and maintained by [Hibulla](https://www.hibulla.com).  
+Contact: [contact@hibulla.com](mailto:contact@hibulla.com)
+
 ## License
 
 Apache 2.0

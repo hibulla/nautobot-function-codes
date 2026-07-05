@@ -2,10 +2,10 @@
 name = "nautobot-function-codes"
 version = "0.2.0"
 description = "A Nautobot plugin for managing reusable Function Codes."
-authors = ["Bartek <dev@example.com>"]
+authors = ["Hibulla <contact@hibulla.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-homepage = "https://github.com/hibulla/nautobot-function-codes"
+homepage = "https://www.hibulla.com"
 repository = "https://github.com/hibulla/nautobot-function-codes"
 documentation = "https://docs.nautobot.com/projects/function-codes/en/latest/"
 keywords = ["nautobot", "nautobot-app", "nautobot-plugin"]

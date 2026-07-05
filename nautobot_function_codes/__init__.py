@@ -13,9 +13,9 @@ class NautobotFunctionCodesConfig(NautobotAppConfig):
     name = "nautobot_function_codes"
     verbose_name = "Function Codes"
     version = __version__
-    author = "Bartek"
-    author_email = "dev@example.com"
-    description = "A Nautobot plugin for managing reusable Function Codes."
+    author = "Hibulla"
+    author_email = "contact@hibulla.com"
+    description = "A Nautobot plugin for managing reusable Function Codes. Created by Hibulla."
     base_url = "function-codes"
     min_version = "3.1.0"
     max_version = "4.0.0"

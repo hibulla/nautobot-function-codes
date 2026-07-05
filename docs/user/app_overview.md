@@ -17,8 +17,7 @@ This document provides an overview of the App including critical information and
 
 ## Authors and Maintainers
 
-!!! warning "Developer Note - Remove Me!"
-    Add the team and/or the main individuals maintaining this project. Include historical maintainers as well.
+This plugin is created and maintained by [Hibulla](https://www.hibulla.com). For questions or support, contact [contact@hibulla.com](mailto:contact@hibulla.com).
 
 ## Nautobot Features Used
 

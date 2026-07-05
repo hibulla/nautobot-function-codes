@@ -5,7 +5,7 @@ site_dir: "nautobot_function_codes/static/nautobot_function_codes/docs"
 site_name: "Nautobot Function Codes Documentation"
 site_url: "https://docs.nautobot.com/projects/function-codes/en/latest/"
 repo_url: "https://github.com/hibulla/nautobot-function-codes"
-copyright: "Copyright &copy; The Authors"
+copyright: "Copyright &copy; <a href=\"https://www.hibulla.com\">Hibulla</a>"
 theme:
   name: "material"
   navigation_depth: 4
