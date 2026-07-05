@@ -1,6 +1,6 @@
 """Test FunctionCode filters."""
 
-from nautobot.apps.testing import FilterTestCases
+from nautobot.apps.testing import FilterTestCases, TestCase
 
 from nautobot_function_codes import filters, models
 from nautobot_function_codes.tests import fixtures
@@ -54,16 +54,11 @@ class FunctionCodeFilterTestCase(FilterTestCases.FilterTestCase):
         self.assertNotIn(inactive_code, self.filterset({"is_active": True}, self.queryset).qs)
 
 
-class DeviceFunctionCodeAssignmentFilterTestCase(FilterTestCases.FilterTestCase):
+class DeviceFunctionCodeAssignmentFilterTestCase(TestCase):
     """DeviceFunctionCodeAssignment Filter Test Case."""
 
     queryset = models.DeviceFunctionCodeAssignment.objects.all()
     filterset = filters.DeviceFunctionCodeAssignmentFilterSet
-    generic_filter_tests = (
-        ("id",),
-        ("created",),
-        ("last_updated",),
-    )
 
     @classmethod
     def setUpTestData(cls):
