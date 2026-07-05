@@ -14,13 +14,12 @@ env:
   APP_NAME: "nautobot-function-codes"
   PYTHON_VERSION: "3.12"
   NAUTOBOT_VERSION: "3.1.0"
+  INVOKE_NAUTOBOT_FUNCTION_CODES_PYTHON_VER: "3.12"
+  INVOKE_NAUTOBOT_FUNCTION_CODES_NAUTOBOT_VER: "3.1.0"
 
 jobs:
   ci:
     runs-on: "ubuntu-latest"
-    env:
-      INVOKE_NAUTOBOT_FUNCTION_CODES_PYTHON_VER: "${{ env.PYTHON_VERSION }}"
-      INVOKE_NAUTOBOT_FUNCTION_CODES_NAUTOBOT_VER: "${{ env.NAUTOBOT_VERSION }}"
     steps:
       - name: "Check out repository code"
         uses: "actions/checkout@v4"
