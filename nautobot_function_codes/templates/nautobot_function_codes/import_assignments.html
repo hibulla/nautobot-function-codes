@@ -16,6 +16,8 @@
             {% csrf_token %}
             {% render_form form %}
             <button type="submit" class="btn btn-primary">Import</button>
+            <a href="{{ export_template_url }}" class="btn btn-default">Download Template</a>
+            <a href="{{ export_current_url }}" class="btn btn-default">Export Current Assignments</a>
         </form>
     </div>
 </div>

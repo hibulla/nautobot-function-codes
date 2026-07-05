@@ -1,6 +1,10 @@
 # Extending the App
 
-!!! warning "Developer Note - Remove Me!"
-    Information on how to extend the App functionality.
+Extending the application is welcome. Open an issue before larger changes so the desired behavior, Nautobot compatibility, and data model impact can be discussed first.
 
-Extending the application is welcome, however it is best to open an issue first, to ensure that a PR would be accepted and makes sense in terms of features and design.
+Common extension points include:
+
+- Additional coverage groupings or reports.
+- Extra import/export formats.
+- Automation that consumes Function Code assignments through the REST API or GraphQL.
+- Custom validators on Function Code records.

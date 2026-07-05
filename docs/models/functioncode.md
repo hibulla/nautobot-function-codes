@@ -24,8 +24,9 @@ Manage assignments from the plugin UI:
 - **Function Codes → Device Assignments** to list, edit, bulk edit, or delete existing assignments
 - **Function Code detail → Assigned Devices** panel to review current links
 - **Device detail → Function Code** panel to view or update the assignment
-- **Function Codes → Coverage** for assignment statistics
-- **Function Codes → Import Assignments** for synchronous CSV import
+- **Function Codes → Coverage** for assignment statistics by Function Code, device status, location, and role
+- **Function Codes → Import Assignments** for synchronous CSV import, template download, and current assignment export
+- **Function Codes → Clear Assignments** to remove assignments from selected devices
 
 The `/api/plugins/function-codes/device-assignments/` API endpoint is available for automation.
 
@@ -37,4 +38,4 @@ switch-01,acc
 switch-02,
 ```
 
-Use the device name or UUID. Leave `function_code` empty to clear an assignment.
+Use the device name or UUID. Leave `function_code` empty to clear an assignment. Inactive Function Codes cannot be assigned.

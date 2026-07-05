@@ -1,13 +1,13 @@
-[tool.poetry]
+[project]
 name = "nautobot-function-codes"
 version = "0.2.0"
 description = "A Nautobot plugin for managing reusable Function Codes."
-authors = ["Hibulla <contact@hibulla.com>"]
+authors = [
+    { name = "hibulla.com", email = "contact@hibulla.com" },
+]
 license = "Apache-2.0"
 readme = "README.md"
-homepage = "https://www.hibulla.com"
-repository = "https://github.com/hibulla/nautobot-function-codes"
-documentation = "https://docs.nautobot.com/projects/function-codes/en/latest/"
+requires-python = ">=3.12,<3.15"
 keywords = ["nautobot", "nautobot-app", "nautobot-plugin"]
 classifiers = [
     "Intended Audience :: Developers",
@@ -17,6 +17,19 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
+dependencies = [
+    "nautobot>=3.1.0,<4.0.0",
+]
+
+[project.urls]
+Homepage = "https://www.hibulla.com"
+Repository = "https://github.com/hibulla/nautobot-function-codes"
+Documentation = "https://docs.nautobot.com/projects/function-codes/en/latest/"
+
+[project.optional-dependencies]
+all = []
+
+[tool.poetry]
 packages = [
     { include = "nautobot_function_codes" },
 ]
@@ -24,11 +37,6 @@ include = [
     # Poetry by default will exclude files that are in .gitignore
     { path = "nautobot_function_codes/static/nautobot_function_codes/docs/**/*", format = ["sdist", "wheel"] }
 ]
-
-[tool.poetry.dependencies]
-python = ">=3.12,<3.15"
-# Used for local development
-nautobot = ">=3.1.0,<4.0.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "*"
@@ -63,10 +71,6 @@ mkdocs-autorefs = "1.2.0"
 griffe = "1.1.1"
 # Image lightboxing in mkdocs
 mkdocs-glightbox = "~0.5.2"
-
-[tool.poetry.extras]
-all = [
-]
 
 [tool.pylint.main]
 # Include the pylint_django plugin to avoid spurious warnings about Django patterns

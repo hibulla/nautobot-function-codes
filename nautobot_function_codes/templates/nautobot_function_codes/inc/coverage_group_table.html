@@ -1,0 +1,31 @@
+<div class="card">
+    <div class="card-header">
+        <strong>{{ title }}</strong>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Assigned</th>
+                    <th>Unassigned</th>
+                    <th>Coverage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.assigned_devices }}</td>
+                    <td>{{ row.unassigned_devices }}</td>
+                    <td>{{ row.assigned_percentage }}%</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-muted">No devices found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

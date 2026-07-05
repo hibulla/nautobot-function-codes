@@ -19,6 +19,11 @@ urlpatterns = [
     path("coverage/", views.CoverageDashboardView.as_view(), name="coverage_dashboard"),
     path("import-assignments/", views.ImportAssignmentsView.as_view(), name="import_assignments"),
     path(
+        "device-assignments/clear/",
+        views.ClearDeviceFunctionCodeAssignmentsView.as_view(),
+        name="devicefunctioncodeassignment_clear",
+    ),
+    path(
         "function-codes/<uuid:pk>/assign-devices/",
         views.FunctionCodeAssignDevicesView.as_view(),
         name="functioncode_assign_devices",

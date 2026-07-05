@@ -8,20 +8,25 @@ from django.views import View
 from nautobot.apps.views import NautobotUIViewSet
 from nautobot.core.forms import restrict_form_fields
 from nautobot.core.utils.requests import normalize_querydict
-from nautobot.core.views.mixins import GetReturnURLMixin, ObjectPermissionRequiredMixin
+from nautobot.core.views.mixins import (
+    ContentTypePermissionRequiredMixin,
+    GetReturnURLMixin,
+)
 
 from nautobot_function_codes import filters, models, tables
 from nautobot_function_codes.api import serializers
 from nautobot_function_codes.forms.assignment import (
     BulkAssignDevicesForm,
+    ClearDeviceFunctionCodeAssignmentsForm,
     DeviceFunctionCodeAssignmentBulkEditForm,
     DeviceFunctionCodeAssignmentFilterForm,
     DeviceFunctionCodeAssignmentForm,
     FunctionCodeAssignDevicesForm,
 )
-from nautobot_function_codes.utils import assign_devices_to_function_code
+from nautobot_function_codes.utils import assign_devices_to_function_code, unassign_devices
 
 ASSIGN_DEVICES_TEMPLATE = "nautobot_function_codes/assign_devices.html"
+CLEAR_ASSIGNMENTS_TEMPLATE = "nautobot_function_codes/clear_assignments.html"
 
 
 def _assign_devices_and_message(request, function_code, devices):
@@ -91,7 +96,7 @@ class DeviceFunctionCodeAssignmentUIViewSet(NautobotUIViewSet):
         return redirect(return_url)
 
 
-class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredMixin, View):
+class FunctionCodeAssignDevicesView(GetReturnURLMixin, ContentTypePermissionRequiredMixin, View):
     """Assign multiple devices to a single Function Code (Function Code fixed by URL)."""
 
     template_name = ASSIGN_DEVICES_TEMPLATE
@@ -99,7 +104,7 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
 
     def get_required_permission(self):
         """Require permission to change Function Code assignments."""
-        return "nautobot_function_codes.change_functioncode"
+        return "nautobot_function_codes.change_devicefunctioncodeassignment"
 
     def get(self, request, pk):
         """Render the bulk assignment form."""
@@ -146,4 +151,51 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ObjectPermissionRequiredM
 
         devices = form.cleaned_data["devices"]
         _assign_devices_and_message(request, function_code, devices)
+        return redirect(return_url)
+
+
+class ClearDeviceFunctionCodeAssignmentsView(GetReturnURLMixin, ContentTypePermissionRequiredMixin, View):
+    """Clear Function Code assignments for one or more devices."""
+
+    template_name = CLEAR_ASSIGNMENTS_TEMPLATE
+    queryset = models.DeviceFunctionCodeAssignment.objects.all()
+
+    def get_required_permission(self):
+        """Require permission to change assignment records."""
+        return "nautobot_function_codes.change_devicefunctioncodeassignment"
+
+    def get(self, request):
+        """Render the clear assignments form."""
+        form = ClearDeviceFunctionCodeAssignmentsForm()
+        restrict_form_fields(form, request.user)
+        return render(
+            request,
+            self.template_name,
+            {
+                "form": form,
+                "return_url": self.get_return_url(request),
+            },
+        )
+
+    def post(self, request):
+        """Clear the selected devices' Function Code assignments."""
+        form = ClearDeviceFunctionCodeAssignmentsForm(request.POST)
+        restrict_form_fields(form, request.user)
+        return_url = self.get_return_url(request)
+
+        if not form.is_valid():
+            return render(
+                request,
+                self.template_name,
+                {
+                    "form": form,
+                    "return_url": return_url,
+                },
+            )
+
+        devices = form.cleaned_data["devices"]
+        unassign_devices(devices)
+        messages.success(request, f"Cleared Function Code assignment for {len(devices)} device(s).")
+        if not return_url:
+            return_url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_list")
         return redirect(return_url)

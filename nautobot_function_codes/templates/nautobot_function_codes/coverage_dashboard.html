@@ -12,7 +12,7 @@
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Total Devices</h5>
@@ -20,7 +20,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Assigned</h5>
@@ -28,7 +28,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Unassigned</h5>
@@ -37,6 +37,20 @@
                     <a href="{{ stats.unassigned_devices_url }}">{{ stats.unassigned_devices }}</a>
                     {% else %}
                     {{ stats.unassigned_devices }}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Inactive Assignments</h5>
+                <p class="display-6 mb-0">
+                    {% if stats.inactive_assignments %}
+                    <a href="{{ stats.inactive_assignments_url }}">{{ stats.inactive_assignments }}</a>
+                    {% else %}
+                    {{ stats.inactive_assignments }}
                     {% endif %}
                 </p>
             </div>
@@ -77,6 +91,18 @@
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        {% include "nautobot_function_codes/inc/coverage_group_table.html" with title="Coverage by Status" rows=stats.status_rows %}
+    </div>
+    <div class="col-md-4">
+        {% include "nautobot_function_codes/inc/coverage_group_table.html" with title="Coverage by Location" rows=stats.location_rows %}
+    </div>
+    <div class="col-md-4">
+        {% include "nautobot_function_codes/inc/coverage_group_table.html" with title="Coverage by Role" rows=stats.role_rows %}
     </div>
 </div>
 {% endblock content %}

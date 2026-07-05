@@ -13,15 +13,15 @@ class NautobotFunctionCodesConfig(NautobotAppConfig):
     name = "nautobot_function_codes"
     verbose_name = "Function Codes"
     version = __version__
-    author = "Hibulla"
+    author = "hibulla.com"
     author_email = "contact@hibulla.com"
-    description = "A Nautobot plugin for managing reusable Function Codes. Created by Hibulla."
+    description = "A Nautobot plugin for managing reusable Function Codes. Created by hibulla.com."
     base_url = "function-codes"
     min_version = "3.1.0"
     max_version = "4.0.0"
     required_settings = []
     default_settings = {
-        "debug_logging": True,
+        "debug_logging": False,
     }
     docs_view_name = "plugins:nautobot_function_codes:docs"
     searchable_models = ["functioncode"]

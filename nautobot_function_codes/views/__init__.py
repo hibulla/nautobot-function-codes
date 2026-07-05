@@ -1,6 +1,7 @@
 """UI views for nautobot_function_codes."""
 
 from nautobot_function_codes.views.assignment import (
+    ClearDeviceFunctionCodeAssignmentsView,
     DeviceFunctionCodeAssignmentUIViewSet,
     FunctionCodeAssignDevicesView,
 )
@@ -11,6 +12,7 @@ from nautobot_function_codes.views.import_assignments import ImportAssignmentsVi
 
 __all__ = (
     "CoverageDashboardView",
+    "ClearDeviceFunctionCodeAssignmentsView",
     "DeviceFunctionCodeAssignmentUIViewSet",
     "DeviceSetFunctionCodeView",
     "FunctionCodeAssignDevicesView",

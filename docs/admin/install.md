@@ -1,9 +1,6 @@
 # Installing the App in Nautobot
 
-Here you will find detailed instructions on how to **install** and **configure** the App within your Nautobot environment.
-
-!!! warning "Developer Note - Remove Me!"
-    Detailed instructions on installing the App. You will need to update this section based on any additional dependencies or prerequisites.
+Use this guide to install and enable Nautobot Function Codes in a Nautobot environment.
 
 ## Prerequisites
 
@@ -16,8 +13,7 @@ Here you will find detailed instructions on how to **install** and **configure**
 
 ### Access Requirements
 
-!!! warning "Developer Note - Remove Me!"
-    What external systems (if any) it needs access to in order to work.
+The app does not require access to external systems. Users who manage assignments need permissions for `DeviceFunctionCodeAssignment` records and, for CSV imports, permission to view and change the target Nautobot devices.
 
 ## Install Guide
 
@@ -45,11 +41,11 @@ Once installed, the app needs to be enabled in your Nautobot configuration. The 
 # In your nautobot_config.py
 PLUGINS = ["nautobot_function_codes"]
 
-# PLUGINS_CONFIG = {
-#   "nautobot_function_codes": {
-#     ADD YOUR SETTINGS HERE
-#   }
-# }
+PLUGINS_CONFIG = {
+    "nautobot_function_codes": {
+        "debug_logging": False,
+    }
+}
 ```
 
 Once the Nautobot configuration is updated, run the Post Upgrade command (`nautobot-server post_upgrade`) to run migrations and clear any cache:
@@ -70,13 +66,8 @@ sudo systemctl restart nautobot nautobot-worker nautobot-scheduler
 
 ## App Configuration
 
-!!! warning "Developer Note - Remove Me!"
-    Any configuration required to get the App set up. Edit the table below as per the examples provided.
-
 The app behavior can be controlled with the following list of settings:
 
-| Key     | Example | Default | Description                          |
-| ------- | ------ | -------- | ------------------------------------- |
-| `enable_backup` | `True` | `True` | A boolean to represent whether or not to run backup configurations within the app. |
-| `platform_slug_map` | `{"cisco_wlc": "cisco_aireos"}` | `None` | A dictionary in which the key is the platform slug and the value is what netutils uses in any "network_os" parameter. |
-| `per_feature_bar_width` | `0.15` | `0.15` | The width of the table bar within the overview report |
+| Key | Example | Default | Description |
+| --- | ------- | ------- | ----------- |
+| `debug_logging` | `True` | `False` | Enables verbose debug logging for assignment helper operations. |

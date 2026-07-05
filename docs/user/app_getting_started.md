@@ -8,12 +8,12 @@ To install the App, please follow the instructions detailed in the [Installation
 
 ## First steps with the App
 
-!!! warning "Developer Note - Remove Me!"
-    What (with screenshots preferably) does it look like to perform the simplest workflow within the App once installed?
+1. Open **Function Codes > Function Codes** and create the Function Codes your team uses.
+2. Open a Function Code detail page and select **Assign Devices** to assign one or more devices.
+3. Open **Function Codes > Coverage** to review assignment coverage by Function Code, status, location, and role.
+4. Use **Function Codes > Import Assignments** to download a template, export current assignments, or upload a CSV file with `device,function_code` columns.
+5. Use **Function Codes > Clear Assignments** when selected devices should no longer have a Function Code.
 
 ## What are the next steps?
-
-!!! warning "Developer Note - Remove Me!"
-    After taking the first steps, what else could the users look at doing.
 
 You can check out the [Use Cases](app_use_cases.md) section for more examples.

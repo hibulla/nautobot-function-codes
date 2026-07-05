@@ -5,21 +5,21 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from nautobot.core.forms import restrict_form_fields
-from nautobot.core.views.mixins import ObjectPermissionRequiredMixin
+from nautobot.core.views.mixins import ContentTypePermissionRequiredMixin
 from nautobot.dcim.models import Device
 
 from nautobot_function_codes.forms.device import DeviceFunctionCodePanelForm
 from nautobot_function_codes.utils import get_device_function_code, set_device_function_code
 
 
-class DeviceSetFunctionCodeView(ObjectPermissionRequiredMixin, View):
+class DeviceSetFunctionCodeView(ContentTypePermissionRequiredMixin, View):
     """Update or clear the Function Code assigned to a device."""
 
     queryset = Device.objects.all()
 
     def get_required_permission(self):
         """Require permission to change Function Code assignments."""
-        return "nautobot_function_codes.change_functioncode"
+        return "nautobot_function_codes.change_devicefunctioncodeassignment"
 
     def post(self, request, pk):
         """Apply the submitted Function Code assignment."""

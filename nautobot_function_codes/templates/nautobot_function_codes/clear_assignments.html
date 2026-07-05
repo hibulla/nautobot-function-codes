@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load form_helpers %}
+
+{% block title %}Clear Device Assignments{% endblock title %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>Clear Device Assignments</h1>
+        <p class="text-muted">Remove Function Code assignments from selected devices.</p>
+
+        <form method="post" class="form">
+            {% csrf_token %}
+            {% render_form form %}
+            <button type="submit" class="btn btn-danger">Clear Assignments</button>
+            {% if return_url %}
+            <a href="{{ return_url }}" class="btn btn-default">Cancel</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock javascript %}

@@ -47,15 +47,46 @@ def set_device_function_code(device, function_code):
     return assignment
 
 
+def set_devices_function_code(devices, function_code):
+    """Create or update Function Code assignments for multiple devices."""
+    if function_code == "":
+        function_code = None
+
+    if function_code is not None and not isinstance(function_code, FunctionCode):
+        raise TypeError("function_code must be a FunctionCode instance or None")
+
+    validate_function_code_for_assignment(function_code)
+
+    devices = list(devices)
+    existing_assignments = {
+        assignment.device_id: assignment
+        for assignment in DeviceFunctionCodeAssignment.objects.filter(device_id__in=[device.pk for device in devices])
+    }
+
+    assignments = []
+    with transaction.atomic():
+        for device in devices:
+            assignment = existing_assignments.get(device.pk)
+            created = assignment is None
+            if created:
+                assignment = DeviceFunctionCodeAssignment(device=device)
+            assignment.function_code = function_code
+            assignment.validated_save()
+            assignments.append(assignment)
+            debug_log(
+                "set_devices_function_code: device_pk=%s function_code_pk=%s created=%s",
+                device.pk,
+                getattr(function_code, "pk", None),
+                created,
+            )
+    return assignments
+
+
 def assign_devices_to_function_code(function_code, devices):
     """Assign multiple devices to the same Function Code."""
-    with transaction.atomic():
-        assignments = [set_device_function_code(device, function_code) for device in devices]
-    return assignments
+    return set_devices_function_code(devices, function_code)
 
 
 def unassign_devices(devices):
     """Clear Function Code assignments for the given devices."""
-    with transaction.atomic():
-        assignments = [set_device_function_code(device, None) for device in devices]
-    return assignments
+    return set_devices_function_code(devices, None)

@@ -5,7 +5,7 @@ site_dir: "nautobot_function_codes/static/nautobot_function_codes/docs"
 site_name: "Nautobot Function Codes Documentation"
 site_url: "https://docs.nautobot.com/projects/function-codes/en/latest/"
 repo_url: "https://github.com/hibulla/nautobot-function-codes"
-copyright: "Copyright &copy; <a href=\"https://www.hibulla.com\">Hibulla</a>"
+copyright: "Copyright &copy; <a href=\"https://www.hibulla.com\">hibulla.com</a>"
 theme:
   name: "material"
   navigation_depth: 4
@@ -122,7 +122,6 @@ nav:
       - Release Notes:
           - "admin/release_notes/index.md"
           - v0.2: "admin/release_notes/version_0.2.md"
-          - v1.0: "admin/release_notes/version_1.0.md"
   - Developer Guide:
       - Extending the App: "dev/extending.md"
       - Contributing to the App: "dev/contributing.md"

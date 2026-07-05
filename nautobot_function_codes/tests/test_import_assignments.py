@@ -67,7 +67,7 @@ class ImportAssignmentsViewTest(TestCase):
     """HTTP tests for the import assignments view."""
 
     user_permissions = (
-        "nautobot_function_codes.change_functioncode",
+        "nautobot_function_codes.change_devicefunctioncodeassignment",
         "dcim.view_device",
         "dcim.change_device",
         "nautobot_function_codes.view_functioncode",
@@ -97,3 +97,20 @@ class ImportAssignmentsViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "updated=1")
         self.assertEqual(get_device_function_code(self.device), self.function_code)
+
+    def test_import_view_downloads_template(self):
+        url = reverse("plugins:nautobot_function_codes:import_assignments")
+        response = self.client.get(url, {"export": "template"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        self.assertIn("function-code-assignments-template.csv", response["Content-Disposition"])
+        self.assertEqual(response.content.decode().splitlines()[0], "device,function_code")
+
+    def test_import_view_exports_current_assignments(self):
+        set_device_function_code(self.device, self.function_code)
+        url = reverse("plugins:nautobot_function_codes:import_assignments")
+        response = self.client.get(url, {"export": "current"})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn("device,function_code", content)
+        self.assertIn(f"{self.device.name},{self.function_code.slug}", content)

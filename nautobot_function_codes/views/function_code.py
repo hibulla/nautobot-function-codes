@@ -27,7 +27,7 @@ class FunctionCodeUIViewSet(NautobotUIViewSet):
                 label="Assign Devices",
                 icon="mdi-server-plus",
                 link_name="plugins:nautobot_function_codes:functioncode_assign_devices",
-                required_permissions=["nautobot_function_codes.change_functioncode"],
+                required_permissions=["nautobot_function_codes.change_devicefunctioncodeassignment"],
             ),
         ],
         panels=[

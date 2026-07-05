@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 from nautobot.dcim.models import Device
 
 from nautobot_function_codes import models
@@ -67,31 +68,70 @@ def _parse_csv(text):
     return rows
 
 
-def _resolve_device(device_value, user):
-    """Look up a device by UUID or name within the user's permissions."""
-    devices = Device.objects.restrict(user, "change")
+def _build_device_lookup(parsed_rows, user):
+    """Build permission-aware device lookup maps for an import."""
+    device_names = set()
+    device_uuids = set()
+    for _, device_value, _ in parsed_rows:
+        if not device_value:
+            continue
+        try:
+            device_uuids.add(uuid.UUID(device_value))
+        except (TypeError, ValueError):
+            device_names.add(device_value)
+
+    devices = Device.objects.restrict(user, "change").select_related("function_code_assignment__function_code")
+    query = Q()
+    if device_uuids:
+        query |= Q(pk__in=device_uuids)
+    if device_names:
+        query |= Q(name__in=device_names)
+    if not query:
+        return {}, {}
+
+    by_pk = {}
+    by_name = {}
+    for device in devices.filter(query).order_by("name", "pk"):
+        by_pk[device.pk] = device
+        by_name.setdefault(device.name, device)
+    return by_pk, by_name
+
+
+def _build_function_code_lookup(parsed_rows, user):
+    """Build permission-aware Function Code lookup maps for an import."""
+    values = {function_code_value for _, _, function_code_value in parsed_rows if function_code_value}
+    if not values:
+        return {}, {}
+
+    function_codes = models.FunctionCode.objects.restrict(user, "view").filter(Q(slug__in=values) | Q(name__in=values))
+    by_slug = {}
+    by_name = {}
+    for function_code in function_codes:
+        by_slug[function_code.slug] = function_code
+        by_name[function_code.name] = function_code
+    return by_slug, by_name
+
+
+def _resolve_device_from_lookup(device_value, devices_by_pk, devices_by_name):
+    """Look up a device by UUID or name from preloaded maps."""
     try:
         device_uuid = uuid.UUID(device_value)
     except (TypeError, ValueError):
         device_uuid = None
 
     if device_uuid is not None:
-        device = devices.filter(pk=device_uuid).first()
+        device = devices_by_pk.get(device_uuid)
         if device is not None:
             return device
+    return devices_by_name.get(device_value)
 
-    return devices.filter(name=device_value).first()
 
-
-def _resolve_function_code(function_code_value, user):
-    """Look up an active Function Code by slug or name within the user's permissions."""
+def _resolve_function_code_from_lookup(function_code_value, function_codes_by_slug, function_codes_by_name):
+    """Look up and validate a Function Code from preloaded maps."""
     if not function_code_value:
         return None
 
-    function_codes = models.FunctionCode.objects.restrict(user, "view")
-    function_code = function_codes.filter(slug=function_code_value).first()
-    if function_code is None:
-        function_code = function_codes.filter(name=function_code_value).first()
+    function_code = function_codes_by_slug.get(function_code_value) or function_codes_by_name.get(function_code_value)
     if function_code is None:
         raise ValueError(f"Function Code '{function_code_value}' was not found.")
 
@@ -117,6 +157,8 @@ def import_assignments_from_csv(csv_file, user, *, dry_run=False):
 
     parsed_rows = _parse_csv(raw)
     result = ImportAssignmentsResult(dry_run=dry_run)
+    devices_by_pk, devices_by_name = _build_device_lookup(parsed_rows, user)
+    function_codes_by_slug, function_codes_by_name = _build_function_code_lookup(parsed_rows, user)
 
     for row_number, device_value, function_code_value in parsed_rows:
         if not device_value:
@@ -132,7 +174,7 @@ def import_assignments_from_csv(csv_file, user, *, dry_run=False):
             )
             continue
 
-        device = _resolve_device(device_value, user)
+        device = _resolve_device_from_lookup(device_value, devices_by_pk, devices_by_name)
         if device is None:
             result.errors += 1
             result.rows.append(
@@ -147,7 +189,11 @@ def import_assignments_from_csv(csv_file, user, *, dry_run=False):
             continue
 
         try:
-            function_code = _resolve_function_code(function_code_value, user)
+            function_code = _resolve_function_code_from_lookup(
+                function_code_value,
+                function_codes_by_slug,
+                function_codes_by_name,
+            )
         except ValueError as exc:
             result.errors += 1
             result.rows.append(

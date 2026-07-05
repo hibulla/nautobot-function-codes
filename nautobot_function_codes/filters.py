@@ -1,5 +1,6 @@
 """Filtering for nautobot_function_codes."""
 
+import django_filters
 from nautobot.apps.filters import (
     NameSearchFilterSet,
     NaturalKeyOrPKMultipleChoiceFilter,
@@ -41,6 +42,10 @@ class DeviceFunctionCodeAssignmentFilterSet(NautobotFilterSet):
         field_name="function_code",
         queryset=models.FunctionCode.objects.all(),
         to_field_name="slug",
+    )
+    function_code_is_active = django_filters.BooleanFilter(
+        field_name="function_code__is_active",
+        label="Function Code Active",
     )
 
     class Meta:

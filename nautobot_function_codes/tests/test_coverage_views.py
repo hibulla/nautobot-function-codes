@@ -41,7 +41,12 @@ class CoverageServiceTest(TestCase):
         self.assertGreaterEqual(stats.total_devices, 3)
         self.assertGreaterEqual(stats.assigned_devices, 2)
         self.assertGreaterEqual(stats.unassigned_devices, 1)
+        self.assertGreaterEqual(stats.inactive_assignments, 1)
+        self.assertTrue(stats.status_rows)
+        self.assertTrue(stats.location_rows)
+        self.assertTrue(stats.role_rows)
         self.assertIn("nautobot_function_codes_has_function_code=false", stats.unassigned_devices_url)
+        self.assertIn("function_code_is_active=false", stats.inactive_assignments_url)
 
     def test_get_audit_report_includes_unassigned_and_inactive(self):
         report = get_audit_report(self.user)
@@ -66,3 +71,5 @@ class CoverageDashboardViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Function Code Coverage")
         self.assertContains(response, self.function_code.name)
+        self.assertContains(response, "Coverage by Status")
+        self.assertContains(response, "Inactive Assignments")

@@ -10,8 +10,7 @@ Prior to removing the app from the `nautobot_config.py`, run the following comma
 nautobot-server migrate nautobot_function_codes zero
 ```
 
-!!! warning "Developer Note - Remove Me!"
-    Any other cleanup operations to ensure the database is clean after the app is removed. Is there anything else that needs cleaning up, such as CFs, relationships, etc. if they're no longer desired?
+This removes Function Code and Device Function Code Assignment records managed by the app. Review backups and export any assignment data you need before rolling migrations back.
 
 ## Remove App configuration
 

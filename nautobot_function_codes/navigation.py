@@ -16,7 +16,7 @@ VIEW_FUNCTION_CODE = "nautobot_function_codes.view_functioncode"
 VIEW_DEVICE_ASSIGNMENT = "nautobot_function_codes.view_devicefunctioncodeassignment"
 ADD_FUNCTION_CODE = "nautobot_function_codes.add_functioncode"
 ADD_DEVICE_ASSIGNMENT = "nautobot_function_codes.add_devicefunctioncodeassignment"
-CHANGE_FUNCTION_CODE = "nautobot_function_codes.change_functioncode"
+CHANGE_DEVICE_ASSIGNMENT = "nautobot_function_codes.change_devicefunctioncodeassignment"
 
 function_code_items = (
     NavMenuItem(
@@ -53,7 +53,13 @@ function_code_items = (
         link="plugins:nautobot_function_codes:import_assignments",
         name="Import Assignments",
         weight=400,
-        permissions=[CHANGE_FUNCTION_CODE],
+        permissions=[CHANGE_DEVICE_ASSIGNMENT],
+    ),
+    NavMenuItem(
+        link="plugins:nautobot_function_codes:devicefunctioncodeassignment_clear",
+        name="Clear Assignments",
+        weight=500,
+        permissions=[CHANGE_DEVICE_ASSIGNMENT],
     ),
 )
 

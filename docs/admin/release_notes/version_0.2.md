@@ -18,12 +18,18 @@ This document describes all new features and changes in the release `0.2`. The f
 - Coverage dashboard with assignment statistics
 - Device list filter by Function Code and by whether a device has a Function Code assigned
 - Synchronous CSV import UI for device assignments
+- CSV template download and current assignment export from the import UI
+- Bulk assignment clearing from the plugin menu
+- Coverage dashboard breakdowns by device status, location, and role
+- Coverage dashboard link to assignments using inactive Function Codes
 - Nautobot Jobs: Audit Function Code Assignments and Import Function Code Assignments
 - Validation preventing assignment of inactive Function Codes
 
 ### Changed
 
 - Minimum supported Python version is now 3.12
+- Assignment actions now use Device Function Code Assignment change permissions instead of Function Code change permissions
+- Plugin debug logging is disabled by default
 
 ### Removed
 

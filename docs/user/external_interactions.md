@@ -1,17 +1,18 @@
 # External Interactions
 
-This document describes external dependencies and prerequisites for this App to operate, including system requirements, API endpoints, interconnection or integrations to other applications or services, and similar topics.
-
-!!! warning "Developer Note - Remove Me!"
-    Optional page, remove if not applicable.
+Nautobot Function Codes stores all data in Nautobot and does not call external systems.
 
 ## External System Integrations
 
 ### From the App to Other Systems
 
+None.
+
 ### From Other Systems to the App
+
+External systems can interact with the app through Nautobot's REST API and GraphQL support.
 
 ## Nautobot REST API endpoints
 
-!!! warning "Developer Note - Remove Me!"
-    API documentation in this doc - including python request examples, curl examples, postman collections referred etc.
+- `/api/plugins/function-codes/function-codes/`
+- `/api/plugins/function-codes/device-assignments/`

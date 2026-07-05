@@ -18,14 +18,16 @@ Documentation: [docs.nautobot.com/projects/function-codes](https://docs.nautobot
 - One Function Code per device (via `DeviceFunctionCodeAssignment`)
 - Assign devices in bulk from Function Code detail or Device Assignments
 - Device Assignments list with view, edit, bulk edit, and delete
+- Clear assignments in bulk from the plugin menu
 - Function Code column on the Device list
 - Editable Function Code panel on Device detail pages
 - Validation prevents assigning inactive Function Codes
 
 ### Coverage and import
 
-- Coverage dashboard with assignment statistics and links to unassigned devices
-- Synchronous CSV import from **Function Codes → Import Assignments** (no Celery required)
+- Coverage dashboard with assignment statistics by Function Code, status, location, and role
+- Links to unassigned devices and assignments that reference inactive Function Codes
+- Synchronous CSV import/export from **Function Codes → Import Assignments** (no Celery required)
 - Nautobot Jobs for scheduled or background audit and CSV import (requires Celery worker)
 
 ### Filtering
@@ -91,8 +93,9 @@ Device assignments are managed from the **Function Codes** plugin menu:
 4. **Function Codes → Device Assignments** — list, edit, bulk edit, and delete assignments
 5. **Function Code detail → Assigned Devices** — view devices linked to a Function Code
 6. **Device detail → Function Code** — view or update the assignment for a single device
-7. **Function Codes → Coverage** — review assignment coverage and open unassigned devices
-8. **Function Codes → Import Assignments** — upload a CSV file and apply assignments synchronously
+7. **Function Codes → Coverage** — review assignment coverage and open unassigned or inactive assignments
+8. **Function Codes → Import Assignments** — upload, validate, or export assignment CSV files
+9. **Function Codes → Clear Assignments** — clear assignments for selected devices
 
 ### REST API
 
@@ -119,7 +122,7 @@ switch-02,
 
 Use the device name or UUID. Leave `function_code` empty to clear an assignment. Inactive Function Codes are rejected.
 
-The same format is used by both **Import Assignments** (UI) and the **Import Function Code Assignments** job.
+The same format is used by both **Import Assignments** (UI) and the **Import Function Code Assignments** job. The import UI can also download a blank CSV template or export the current assignment state.
 
 ### Jobs
 
@@ -142,7 +145,7 @@ Function Codes use Nautobot's `OrganizationalModel` base class (similar to Roles
 
 ## About
 
-This plugin is created and maintained by [Hibulla](https://www.hibulla.com).  
+This plugin is created and maintained by [hibulla.com](https://www.hibulla.com).
 Contact: [contact@hibulla.com](mailto:contact@hibulla.com)
 
 ## License

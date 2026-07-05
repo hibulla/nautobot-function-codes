@@ -90,6 +90,20 @@ class DeviceAssignmentViewTest(TestCase):
         self.assertEqual(get_device_function_code(self.devices[1]), self.function_code)
         self.assertIsNone(get_device_function_code(self.devices[2]))
 
+    def test_clear_assignments_view_clears_multiple_devices(self):
+        for device in self.devices[:2]:
+            models.DeviceFunctionCodeAssignment.objects.create(device=device, function_code=self.function_code)
+        url = reverse("plugins:nautobot_function_codes:devicefunctioncodeassignment_clear")
+        response = self.client.post(
+            url,
+            {
+                "devices": [str(device.pk) for device in self.devices[:2]],
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIsNone(get_device_function_code(self.devices[0]))
+        self.assertIsNone(get_device_function_code(self.devices[1]))
+
     def test_assignment_bulk_edit_updates_function_code(self):
         assignment = models.DeviceFunctionCodeAssignment.objects.create(
             device=self.devices[0],

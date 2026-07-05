@@ -1,7 +1,9 @@
 # Architecture Decision Records
 
-The intention is to document deviations from a standard Model View Controller (MVC) design.
+Architecture decisions for this app should be recorded here when they affect data modeling, Nautobot integration points, permissions, or long-term compatibility.
 
-!!! warning "Developer Note - Remove Me!"
-    Optional page, remove if not applicable.
-    For examples see [Golden Config](https://github.com/nautobot/nautobot-app-golden-config/blob/develop/docs/dev/arch_decision.md).
+Current notable decisions:
+
+- Device assignments are stored in `DeviceFunctionCodeAssignment` rather than as a custom field so they can have their own API, permissions, validation, and UI workflows.
+- Each device has at most one Function Code assignment.
+- Inactive Function Codes are retained for history but are rejected for new assignments.
