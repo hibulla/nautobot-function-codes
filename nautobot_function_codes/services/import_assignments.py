@@ -156,17 +156,9 @@ def _resolve_function_code_from_lookup(function_code_value, function_codes_by_sl
     return function_code
 
 
-def _add_import_row(result, row_number, device_name, function_code_slug, status, message=""):
+def _add_import_row(result, row):
     """Append a row result to the import result."""
-    result.rows.append(
-        ImportRowResult(
-            row_number=row_number,
-            device_name=device_name,
-            function_code_slug=function_code_slug,
-            status=status,
-            message=message,
-        )
-    )
+    result.rows.append(row)
 
 
 def _process_import_row(row, lookups, result, *, dry_run):
@@ -176,11 +168,13 @@ def _process_import_row(row, lookups, result, *, dry_run):
         result.errors += 1
         _add_import_row(
             result,
-            row_number,
-            device_value,
-            function_code_value,
-            "error",
-            "Device value is required.",
+            ImportRowResult(
+                row_number=row_number,
+                device_name=device_value,
+                function_code_slug=function_code_value,
+                status="error",
+                message="Device value is required.",
+            ),
         )
         return
 
@@ -189,11 +183,13 @@ def _process_import_row(row, lookups, result, *, dry_run):
         result.errors += 1
         _add_import_row(
             result,
-            row_number,
-            device_value,
-            function_code_value,
-            "error",
-            f"Device '{device_value}' was not found or is not permitted.",
+            ImportRowResult(
+                row_number=row_number,
+                device_name=device_value,
+                function_code_slug=function_code_value,
+                status="error",
+                message=f"Device '{device_value}' was not found or is not permitted.",
+            ),
         )
         return
 
@@ -205,7 +201,16 @@ def _process_import_row(row, lookups, result, *, dry_run):
         )
     except ValueError as exc:
         result.errors += 1
-        _add_import_row(result, row_number, device.name, function_code_value, "error", str(exc))
+        _add_import_row(
+            result,
+            ImportRowResult(
+                row_number=row_number,
+                device_name=device.name,
+                function_code_slug=function_code_value,
+                status="error",
+                message=str(exc),
+            ),
+        )
         return
 
     current_function_code = getattr(
@@ -217,11 +222,13 @@ def _process_import_row(row, lookups, result, *, dry_run):
         result.skipped += 1
         _add_import_row(
             result,
-            row_number,
-            device.name,
-            function_code_value,
-            "skipped",
-            "Assignment already matches.",
+            ImportRowResult(
+                row_number=row_number,
+                device_name=device.name,
+                function_code_slug=function_code_value,
+                status="skipped",
+                message="Assignment already matches.",
+            ),
         )
         return
 
@@ -231,16 +238,27 @@ def _process_import_row(row, lookups, result, *, dry_run):
 
     if function_code is None:
         result.cleared += 1
-        _add_import_row(result, row_number, device.name, function_code_value, "cleared", "Assignment cleared.")
+        _add_import_row(
+            result,
+            ImportRowResult(
+                row_number=row_number,
+                device_name=device.name,
+                function_code_slug=function_code_value,
+                status="cleared",
+                message="Assignment cleared.",
+            ),
+        )
     else:
         result.updated += 1
         _add_import_row(
             result,
-            row_number,
-            device.name,
-            function_code_value,
-            "updated",
-            f"Assigned to {function_code.name}.",
+            ImportRowResult(
+                row_number=row_number,
+                device_name=device.name,
+                function_code_slug=function_code_value,
+                status="updated",
+                message=f"Assigned to {function_code.name}.",
+            ),
         )
 
 
