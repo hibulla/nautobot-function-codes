@@ -2,11 +2,11 @@
 
 from django.templatetags.static import static
 from nautobot.apps.ui import (
+    NavigationWeightChoices,
     NavMenuAddButton,
     NavMenuGroup,
     NavMenuItem,
     NavMenuTab,
-    NavigationWeightChoices,
 )
 
 # Material Design Icons equivalent: mdi mdi-tag-multiple
