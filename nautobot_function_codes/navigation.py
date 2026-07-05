@@ -67,7 +67,6 @@ menu_items = (
             NavMenuGroup(
                 name="Function Codes",
                 weight=100,
-                permissions=[VIEW_FUNCTION_CODE],
                 items=function_code_items,
             ),
         ),
