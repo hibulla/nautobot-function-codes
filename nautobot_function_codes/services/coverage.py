@@ -36,6 +36,23 @@ class DeviceCoverageGroup:
 
 
 @dataclass
+class CoverageLinks:
+    """Links from coverage stats to filtered views."""
+
+    unassigned_devices_url: str
+    inactive_assignments_url: str
+
+
+@dataclass
+class CoverageBreakdowns:
+    """Grouped coverage summaries."""
+
+    status_rows: list[DeviceCoverageGroup]
+    location_rows: list[DeviceCoverageGroup]
+    role_rows: list[DeviceCoverageGroup]
+
+
+@dataclass
 class CoverageStats:
     """Aggregate Function Code assignment coverage."""
 
@@ -43,12 +60,34 @@ class CoverageStats:
     assigned_devices: int
     unassigned_devices: int
     function_code_rows: list[FunctionCodeCoverageRow]
-    unassigned_devices_url: str
     inactive_assignments: int
-    inactive_assignments_url: str
-    status_rows: list[DeviceCoverageGroup]
-    location_rows: list[DeviceCoverageGroup]
-    role_rows: list[DeviceCoverageGroup]
+    links: CoverageLinks
+    breakdowns: CoverageBreakdowns
+
+    @property
+    def unassigned_devices_url(self):
+        """Return the filtered Device list URL for unassigned devices."""
+        return self.links.unassigned_devices_url
+
+    @property
+    def inactive_assignments_url(self):
+        """Return the filtered assignment list URL for inactive Function Code assignments."""
+        return self.links.inactive_assignments_url
+
+    @property
+    def status_rows(self):
+        """Return assignment coverage grouped by Device status."""
+        return self.breakdowns.status_rows
+
+    @property
+    def location_rows(self):
+        """Return assignment coverage grouped by Device location."""
+        return self.breakdowns.location_rows
+
+    @property
+    def role_rows(self):
+        """Return assignment coverage grouped by Device role."""
+        return self.breakdowns.role_rows
 
 
 @dataclass
@@ -111,12 +150,16 @@ def get_coverage_stats(user):
         assigned_devices=assigned_devices,
         unassigned_devices=unassigned_devices,
         function_code_rows=rows,
-        unassigned_devices_url=unassigned_devices_url,
         inactive_assignments=inactive_assignments,
-        inactive_assignments_url=inactive_assignments_url,
-        status_rows=_get_device_group_rows(devices, "status__name"),
-        location_rows=_get_device_group_rows(devices, "location__name"),
-        role_rows=_get_device_group_rows(devices, "role__name"),
+        links=CoverageLinks(
+            unassigned_devices_url=unassigned_devices_url,
+            inactive_assignments_url=inactive_assignments_url,
+        ),
+        breakdowns=CoverageBreakdowns(
+            status_rows=_get_device_group_rows(devices, "status__name"),
+            location_rows=_get_device_group_rows(devices, "location__name"),
+            role_rows=_get_device_group_rows(devices, "role__name"),
+        ),
     )
 
 

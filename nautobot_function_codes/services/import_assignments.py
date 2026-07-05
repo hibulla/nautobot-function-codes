@@ -48,6 +48,16 @@ class ImportAssignmentsResult:
         )
 
 
+@dataclass
+class ImportLookups:
+    """Preloaded lookup maps for a CSV import."""
+
+    devices_by_pk: dict
+    devices_by_name: dict
+    function_codes_by_slug: dict
+    function_codes_by_name: dict
+
+
 def _parse_csv(text):
     """Parse CSV text into row tuples of line number, device, and function code."""
     reader = csv.DictReader(io.StringIO(text))
@@ -146,6 +156,94 @@ def _resolve_function_code_from_lookup(function_code_value, function_codes_by_sl
     return function_code
 
 
+def _add_import_row(result, row_number, device_name, function_code_slug, status, message=""):
+    """Append a row result to the import result."""
+    result.rows.append(
+        ImportRowResult(
+            row_number=row_number,
+            device_name=device_name,
+            function_code_slug=function_code_slug,
+            status=status,
+            message=message,
+        )
+    )
+
+
+def _process_import_row(row, lookups, result, *, dry_run):
+    """Process one parsed CSV row."""
+    row_number, device_value, function_code_value = row
+    if not device_value:
+        result.errors += 1
+        _add_import_row(
+            result,
+            row_number,
+            device_value,
+            function_code_value,
+            "error",
+            "Device value is required.",
+        )
+        return
+
+    device = _resolve_device_from_lookup(device_value, lookups.devices_by_pk, lookups.devices_by_name)
+    if device is None:
+        result.errors += 1
+        _add_import_row(
+            result,
+            row_number,
+            device_value,
+            function_code_value,
+            "error",
+            f"Device '{device_value}' was not found or is not permitted.",
+        )
+        return
+
+    try:
+        function_code = _resolve_function_code_from_lookup(
+            function_code_value,
+            lookups.function_codes_by_slug,
+            lookups.function_codes_by_name,
+        )
+    except ValueError as exc:
+        result.errors += 1
+        _add_import_row(result, row_number, device.name, function_code_value, "error", str(exc))
+        return
+
+    current_function_code = getattr(
+        getattr(device, "function_code_assignment", None),
+        "function_code",
+        None,
+    )
+    if current_function_code == function_code:
+        result.skipped += 1
+        _add_import_row(
+            result,
+            row_number,
+            device.name,
+            function_code_value,
+            "skipped",
+            "Assignment already matches.",
+        )
+        return
+
+    if not dry_run:
+        with transaction.atomic():
+            set_device_function_code(device, function_code)
+
+    if function_code is None:
+        result.cleared += 1
+        _add_import_row(result, row_number, device.name, function_code_value, "cleared", "Assignment cleared.")
+    else:
+        result.updated += 1
+        _add_import_row(
+            result,
+            row_number,
+            device.name,
+            function_code_value,
+            "updated",
+            f"Assigned to {function_code.name}.",
+        )
+
+
 def import_assignments_from_csv(csv_file, user, *, dry_run=False):
     """Import or validate device assignments from a CSV upload."""
     if hasattr(csv_file, "read"):
@@ -157,95 +255,17 @@ def import_assignments_from_csv(csv_file, user, *, dry_run=False):
 
     parsed_rows = _parse_csv(raw)
     result = ImportAssignmentsResult(dry_run=dry_run)
-    devices_by_pk, devices_by_name = _build_device_lookup(parsed_rows, user)
-    function_codes_by_slug, function_codes_by_name = _build_function_code_lookup(parsed_rows, user)
+    lookups = ImportLookups(
+        *_build_device_lookup(parsed_rows, user),
+        *_build_function_code_lookup(parsed_rows, user),
+    )
 
-    for row_number, device_value, function_code_value in parsed_rows:
-        if not device_value:
-            result.errors += 1
-            result.rows.append(
-                ImportRowResult(
-                    row_number=row_number,
-                    device_name=device_value,
-                    function_code_slug=function_code_value,
-                    status="error",
-                    message="Device value is required.",
-                )
-            )
-            continue
-
-        device = _resolve_device_from_lookup(device_value, devices_by_pk, devices_by_name)
-        if device is None:
-            result.errors += 1
-            result.rows.append(
-                ImportRowResult(
-                    row_number=row_number,
-                    device_name=device_value,
-                    function_code_slug=function_code_value,
-                    status="error",
-                    message=f"Device '{device_value}' was not found or is not permitted.",
-                )
-            )
-            continue
-
-        try:
-            function_code = _resolve_function_code_from_lookup(
-                function_code_value,
-                function_codes_by_slug,
-                function_codes_by_name,
-            )
-        except ValueError as exc:
-            result.errors += 1
-            result.rows.append(
-                ImportRowResult(
-                    row_number=row_number,
-                    device_name=device.name,
-                    function_code_slug=function_code_value,
-                    status="error",
-                    message=str(exc),
-                )
-            )
-            continue
-
-        current_function_code = getattr(
-            getattr(device, "function_code_assignment", None),
-            "function_code",
-            None,
-        )
-        if current_function_code == function_code:
-            result.skipped += 1
-            result.rows.append(
-                ImportRowResult(
-                    row_number=row_number,
-                    device_name=device.name,
-                    function_code_slug=function_code_value,
-                    status="skipped",
-                    message="Assignment already matches.",
-                )
-            )
-            continue
-
-        if not dry_run:
-            with transaction.atomic():
-                set_device_function_code(device, function_code)
-
-        if function_code is None:
-            result.cleared += 1
-            status = "cleared"
-            message = "Assignment cleared."
-        else:
-            result.updated += 1
-            status = "updated"
-            message = f"Assigned to {function_code.name}."
-
-        result.rows.append(
-            ImportRowResult(
-                row_number=row_number,
-                device_name=device.name,
-                function_code_slug=function_code_value,
-                status=status,
-                message=message,
-            )
+    for row in parsed_rows:
+        _process_import_row(
+            row,
+            lookups,
+            result,
+            dry_run=dry_run,
         )
 
     return result
