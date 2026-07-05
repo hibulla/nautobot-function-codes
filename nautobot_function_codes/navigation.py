@@ -1,6 +1,5 @@
 """Navigation menu items for the Function Codes plugin."""
 
-from django.templatetags.static import static
 from nautobot.apps.ui import (
     NavigationWeightChoices,
     NavMenuAddButton,
@@ -9,8 +8,7 @@ from nautobot.apps.ui import (
     NavMenuTab,
 )
 
-# Material Design Icons equivalent: mdi mdi-tag-multiple
-FUNCTION_CODES_TAB_ICON = static("nautobot_function_codes/icons/tag-multiple.svg")
+FUNCTION_CODES_TAB_ICON = "nautobot_function_codes/icons/tag-multiple.svg"
 
 VIEW_FUNCTION_CODE = "nautobot_function_codes.view_functioncode"
 VIEW_DEVICE_ASSIGNMENT = "nautobot_function_codes.view_devicefunctioncodeassignment"
