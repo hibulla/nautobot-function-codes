@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "nautobot>=3.1.0,<4.0.0",
+    "nautobot>=3.1.7,<4.0.0",
 ]
 
 [project.urls]
@@ -43,15 +43,15 @@ coverage = "*"
 django-debug-toolbar = "*"
 invoke = "*"
 ipython = "*"
-pylint = { version = ">=3.3.0,<4.0", python = "<3.14" }
+pylint = { version = ">=4.0.6,<5.0", python = "<3.14" }
 pylint-django = { version = ">=2.6.0", python = "<3.14" }
 pylint-nautobot = { version = ">=0.4.0", python = "<3.14" }
-ruff = "0.5.5"
+ruff = "0.15.20"
 yamllint = "*"
 # Python implementation of markdownlint
 pymarkdownlnt = "~0.9.30"
 Markdown = "*"
-towncrier = ">=23.6.0,<=24.8.0"
+towncrier = ">=25.8.0,<=25.8.0"
 to-json-schema = "*"
 jsonschema = "*"
 djlint = ">=1.36.4,<2.0.0"
@@ -65,10 +65,10 @@ mkdocs = "1.6.1"
 # Material for MkDocs theme
 mkdocs-material = "9.7.6"
 # Automatic documentation from sources, for MkDocs
-mkdocstrings = "0.25.2"
-mkdocstrings-python = "1.10.8"
-mkdocs-autorefs = "1.2.0"
-griffe = "1.1.1"
+mkdocstrings = "0.27.0"
+mkdocstrings-python = "1.13.0"
+mkdocs-autorefs = "1.4.4"
+griffe = "2.1.0"
 # Image lightboxing in mkdocs
 mkdocs-glightbox = "~0.5.2"
 

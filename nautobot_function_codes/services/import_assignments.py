@@ -44,9 +44,7 @@ class ImportAssignmentsResult:
     def summary(self):
         """Return a human-readable summary."""
         prefix = "Dry run: " if self.dry_run else ""
-        return (
-            f"{prefix}updated={self.updated}, cleared={self.cleared}, " f"skipped={self.skipped}, errors={self.errors}"
-        )
+        return f"{prefix}updated={self.updated}, cleared={self.cleared}, skipped={self.skipped}, errors={self.errors}"
 
 
 @dataclass

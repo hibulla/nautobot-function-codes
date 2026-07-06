@@ -35,7 +35,7 @@ class ImportAssignmentsServiceTest(TestCase):
 
     def test_import_assigns_and_clears_devices(self):
         set_device_function_code(self.other_device, self.other_function_code)
-        csv_data = "device,function_code\n" f"{self.device.name},acc-import\n" f"{self.other_device.name},\n"
+        csv_data = f"device,function_code\n{self.device.name},acc-import\n{self.other_device.name},\n"
         result = import_assignments_from_csv(self._csv(csv_data), self.user)
         self.assertEqual(result.updated, 1)
         self.assertEqual(result.cleared, 1)
