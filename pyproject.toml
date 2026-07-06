@@ -65,8 +65,8 @@ mkdocs = "1.6.1"
 # Material for MkDocs theme
 mkdocs-material = "9.7.6"
 # Automatic documentation from sources, for MkDocs
-mkdocstrings = "0.27.0"
-mkdocstrings-python = "1.13.0"
+mkdocstrings = "1.0.4"
+mkdocstrings-python = "2.0.5"
 mkdocs-autorefs = "1.4.4"
 griffe = "2.1.0"
 # Image lightboxing in mkdocs
