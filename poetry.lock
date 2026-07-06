@@ -1508,18 +1508,53 @@ graphql-core = ">=3.2,<3.3"
 
 [[package]]
 name = "griffe"
-version = "1.1.1"
+version = "2.1.0"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["docs"]
 files = [
-    {file = "griffe-1.1.1-py3-none-any.whl", hash = "sha256:0c469411e8d671a545725f5c0851a746da8bd99d354a79fdc4abd45219252efb"},
-    {file = "griffe-1.1.1.tar.gz", hash = "sha256:faeb78764c0b2bd010719d6e015d07709b0f260258b5d4dd6c88343d9702aa30"},
+    {file = "griffe-2.1.0-py3-none-any.whl", hash = "sha256:2ccdab17fb9cd76f278d7b5611cfc8f68cbe846d8d48df63dff80b62ecfa6f65"},
+    {file = "griffe-2.1.0.tar.gz", hash = "sha256:c58845df5a364feaabd05ee8c767b97b03e478da8aa18b9923553c812fb0d955"},
+]
+
+[package.dependencies]
+griffecli = "2.1.0"
+griffelib = "2.1.0"
+
+[package.extras]
+pypi = ["griffelib[pypi] (==2.1.0)"]
+
+[[package]]
+name = "griffecli"
+version = "2.1.0"
+description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
+optional = false
+python-versions = ">=3.10"
+groups = ["docs"]
+files = [
+    {file = "griffecli-2.1.0-py3-none-any.whl", hash = "sha256:6e22b1423d562ddc510997b4be1fe89de59e19dcff78831c0f4bfc3b8134a718"},
+    {file = "griffecli-2.1.0.tar.gz", hash = "sha256:2ff68dbee9395fdb668b10374c51683392d697b226ac60159798f4add1ee716c"},
 ]
 
 [package.dependencies]
 colorama = ">=0.4"
+griffelib = "2.1.0"
+
+[[package]]
+name = "griffelib"
+version = "2.1.0"
+description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
+optional = false
+python-versions = ">=3.10"
+groups = ["docs"]
+files = [
+    {file = "griffelib-2.1.0-py3-none-any.whl", hash = "sha256:cc7b3d2d2865ad0b909fcc38086e3f554b5ea7acbaa7bbb7ecaa3f5dfb7d9f00"},
+    {file = "griffelib-2.1.0.tar.gz", hash = "sha256:762a186d2c6fd6794d4ea20d428d597ffb857cb56b66421651cbba15bdd5e813"},
+]
+
+[package.extras]
+pypi = ["pip (>=24.0)", "platformdirs (>=4.2)", "wheel (>=0.42)"]
 
 [[package]]
 name = "idna"
@@ -4225,4 +4260,4 @@ all = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.15"
-content-hash = "3c72c82e98dd8a50f392613628e80c06fe730678c9f3866fdba5e26295c5ebb1"
+content-hash = "aae58366f4b8db57972d8cd970a941fec84c432bd242914ac4e24d5a48f5d743"
