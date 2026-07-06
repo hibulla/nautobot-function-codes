@@ -46,7 +46,7 @@ ipython = "*"
 pylint = { version = ">=3.3.0,<4.0", python = "<3.14" }
 pylint-django = { version = ">=2.6.0", python = "<3.14" }
 pylint-nautobot = { version = ">=0.4.0", python = "<3.14" }
-ruff = "0.5.5"
+ruff = "0.15.20"
 yamllint = "*"
 # Python implementation of markdownlint
 pymarkdownlnt = "~0.9.30"
