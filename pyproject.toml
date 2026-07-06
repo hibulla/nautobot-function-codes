@@ -43,7 +43,7 @@ coverage = "*"
 django-debug-toolbar = "*"
 invoke = "*"
 ipython = "*"
-pylint = { version = ">=3.3.0,<4.0", python = "<3.14" }
+pylint = { version = ">=4.0.6,<5.0", python = "<3.14" }
 pylint-django = { version = ">=2.6.0", python = "<3.14" }
 pylint-nautobot = { version = ">=0.4.0", python = "<3.14" }
 ruff = "0.5.5"
