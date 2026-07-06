@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from nautobot.apps.testing import TestCase
 
-from nautobot_function_codes.services.import_assignments import import_assignments_from_csv
+from nautobot_function_codes.services.import_assignments import MAX_CSV_ROWS, import_assignments_from_csv
 from nautobot_function_codes.tests import fixtures
 from nautobot_function_codes.tests.utils import create_test_device
 from nautobot_function_codes.utils import get_device_function_code, set_device_function_code
@@ -61,6 +61,13 @@ class ImportAssignmentsServiceTest(TestCase):
         result = import_assignments_from_csv(self._csv(csv_data), self.user)
         self.assertEqual(result.errors, 1)
         self.assertIsNone(get_device_function_code(self.device))
+
+    def test_import_rejects_csv_over_row_limit(self):
+        csv_data = "device,function_code\n" + "\n".join(
+            f"missing-device-{index},acc-import" for index in range(MAX_CSV_ROWS + 1)
+        )
+        with self.assertRaisesRegex(ValueError, f"limited to {MAX_CSV_ROWS} non-empty data rows"):
+            import_assignments_from_csv(self._csv(csv_data), self.user)
 
 
 class ImportAssignmentsViewTest(TestCase):

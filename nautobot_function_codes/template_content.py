@@ -25,7 +25,10 @@ class FunctionCodeDetailPanel(Panel):
         device = context["object"]
         function_code = get_device_function_code(device)
         request = context["request"]
-        can_change = request.user.has_perm("nautobot_function_codes.change_devicefunctioncodeassignment")
+        can_change = (
+            request.user.has_perm("nautobot_function_codes.change_devicefunctioncodeassignment")
+            and device.__class__.objects.restrict(request.user, "change").filter(pk=device.pk).exists()
+        )
         panel_form = DeviceFunctionCodePanelForm(initial={"function_code": function_code.pk if function_code else None})
         return {
             "function_code": function_code,

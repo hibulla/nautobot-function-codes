@@ -106,9 +106,19 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ContentTypePermissionRequ
         """Require permission to change Function Code assignments."""
         return "nautobot_function_codes.change_devicefunctioncodeassignment"
 
+    def get_function_code(self, request, pk):
+        """Return a Function Code visible to the current user."""
+        return get_object_or_404(self.queryset.restrict(request.user, "view"), pk=pk)
+
+    def get_form(self, request, data=None):
+        """Return a device assignment form constrained by object permissions."""
+        form = FunctionCodeAssignDevicesForm(data=data)
+        restrict_form_fields(form, request.user)
+        return form
+
     def get(self, request, pk):
         """Render the bulk assignment form."""
-        function_code = get_object_or_404(self.queryset, pk=pk)
+        function_code = self.get_function_code(request, pk)
         if not function_code.is_active:
             messages.error(
                 request, f"Function Code '{function_code.name}' is inactive and cannot receive new assignments."
@@ -120,14 +130,14 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ContentTypePermissionRequ
             self.template_name,
             {
                 "function_code": function_code,
-                "form": FunctionCodeAssignDevicesForm(),
+                "form": self.get_form(request),
                 "return_url": self.get_return_url(request, obj=function_code),
             },
         )
 
     def post(self, request, pk):
         """Assign the selected devices to the Function Code."""
-        function_code = get_object_or_404(self.queryset, pk=pk)
+        function_code = self.get_function_code(request, pk)
         return_url = self.get_return_url(request, obj=function_code)
 
         if not function_code.is_active:
@@ -136,7 +146,7 @@ class FunctionCodeAssignDevicesView(GetReturnURLMixin, ContentTypePermissionRequ
             )
             return redirect(return_url)
 
-        form = FunctionCodeAssignDevicesForm(request.POST)
+        form = self.get_form(request, data=request.POST)
 
         if not form.is_valid():
             return render(

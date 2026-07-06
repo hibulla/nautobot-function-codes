@@ -6,6 +6,8 @@ from nautobot.extras.jobs import BooleanVar, FileVar, Job
 from nautobot_function_codes.services.coverage import get_audit_report
 from nautobot_function_codes.services.import_assignments import import_assignments_from_csv
 
+IMPORT_ROW_LOG_LIMIT = 1000
+
 
 class AuditFunctionCodeAssignments(Job):
     """Report devices without Function Codes and inactive assignments."""
@@ -52,7 +54,7 @@ class ImportFunctionCodeAssignments(Job):
             self.logger.error(str(exc))
             raise
 
-        for row in result.rows:
+        for row in result.rows[:IMPORT_ROW_LOG_LIMIT]:
             self.logger.info(
                 "Row %s [%s] device=%s function_code=%s: %s",
                 row.row_number,
@@ -60,6 +62,10 @@ class ImportFunctionCodeAssignments(Job):
                 row.device_name,
                 row.function_code_slug,
                 row.message,
+            )
+        if len(result.rows) > IMPORT_ROW_LOG_LIMIT:
+            self.logger.info(
+                "Skipped logging %s additional import row result(s).", len(result.rows) - IMPORT_ROW_LOG_LIMIT
             )
 
         if result.errors:

@@ -21,9 +21,13 @@ class DeviceSetFunctionCodeView(ContentTypePermissionRequiredMixin, View):
         """Require permission to change Function Code assignments."""
         return "nautobot_function_codes.change_devicefunctioncodeassignment"
 
+    def get_device(self, request, pk):
+        """Return a Device the current user is allowed to change."""
+        return get_object_or_404(self.queryset.restrict(request.user, "change"), pk=pk)
+
     def post(self, request, pk):
         """Apply the submitted Function Code assignment."""
-        device = get_object_or_404(self.queryset, pk=pk)
+        device = self.get_device(request, pk)
         form = DeviceFunctionCodePanelForm(request.POST)
         restrict_form_fields(form, request.user)
 

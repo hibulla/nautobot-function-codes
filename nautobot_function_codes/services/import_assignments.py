@@ -15,6 +15,7 @@ from nautobot_function_codes.utils import set_device_function_code
 from nautobot_function_codes.validators import validate_function_code_for_assignment
 
 REQUIRED_COLUMNS = ("device", "function_code")
+MAX_CSV_ROWS = 50000
 
 
 @dataclass
@@ -58,7 +59,7 @@ class ImportLookups:
     function_codes_by_name: dict
 
 
-def _parse_csv(text):
+def _parse_csv(text, *, max_rows=MAX_CSV_ROWS):
     """Parse CSV text into row tuples of line number, device, and function code."""
     reader = csv.DictReader(io.StringIO(text))
     if not reader.fieldnames:
@@ -74,6 +75,8 @@ def _parse_csv(text):
         function_code_value = (row.get(normalized_headers["function_code"]) or "").strip()
         if not device_value and not function_code_value:
             continue
+        if len(rows) >= max_rows:
+            raise ValueError(f"CSV import is limited to {max_rows} non-empty data rows.")
         rows.append((index, device_value, function_code_value))
     return rows
 
