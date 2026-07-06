@@ -25,7 +25,7 @@ def _plugin_models_result():
         status="ok",
         check="plugin_models",
         message=(
-            f"FunctionCode records={function_code_count}, " f"DeviceFunctionCodeAssignment records={assignment_count}"
+            f"FunctionCode records={function_code_count}, DeviceFunctionCodeAssignment records={assignment_count}"
         ),
     )
 
