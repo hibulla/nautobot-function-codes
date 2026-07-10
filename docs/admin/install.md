@@ -20,16 +20,24 @@ The app does not require access to external systems. Users who manage assignment
 !!! note
     Apps can be installed from the [Python Package Index](https://pypi.org/) or locally. See the [Nautobot documentation](https://docs.nautobot.com/projects/core/en/stable/user-guide/administration/installation/app-install/) for more details. The pip package name for this app is [`nautobot-function-codes`](https://pypi.org/project/nautobot-function-codes/).
 
-The app is available as a Python package via PyPI and can be installed with `pip`:
+The app is distributed as the `nautobot-function-codes` Python package and is imported by Nautobot as `nautobot_function_codes`.
+
+Install the latest released package from PyPI:
 
 ```shell
 pip install nautobot-function-codes
 ```
 
-To ensure Nautobot Function Codes is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the Nautobot root directory (alongside `requirements.txt`) and list the `nautobot-function-codes` package:
+For production deployments, pin the version that has been validated in your Nautobot environment:
 
 ```shell
-echo nautobot-function-codes >> local_requirements.txt
+pip install nautobot-function-codes==0.2.0
+```
+
+To ensure Nautobot Function Codes is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the Nautobot root directory (alongside `requirements.txt`) and list the pinned package:
+
+```shell
+echo "nautobot-function-codes==0.2.0" >> local_requirements.txt
 ```
 
 Once installed, the app needs to be enabled in your Nautobot configuration. The following block of code below shows the additional configuration required to be added to your `nautobot_config.py` file:
@@ -52,6 +60,12 @@ Once the Nautobot configuration is updated, run the Post Upgrade command (`nauto
 
 ```shell
 nautobot-server post_upgrade
+```
+
+Verify that Nautobot can see the installed package:
+
+```shell
+nautobot-server diagnose_nautobot_function_codes
 ```
 
 Then restart (if necessary) the Nautobot services which may include:

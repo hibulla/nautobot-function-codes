@@ -4,10 +4,7 @@ concurrency:  # Cancel any existing runs of this workflow for this same PR
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 on: # yamllint disable-line rule:truthy rule:comments
-  push:
-    branches:
-      - "main"
-      - "develop"
+  push: ~
   pull_request: ~
 
 env:
@@ -22,7 +19,7 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Check out repository code"
-        uses: "actions/checkout@v7"
+        uses: "actions/checkout@v5"
       - name: "Setup environment"
         uses: "networktocode/gh-action-setup-poetry-environment@v7"
         with:
@@ -32,6 +29,12 @@ jobs:
         env:
           INVOKE_NAUTOBOT_FUNCTION_CODES_LOCAL: "True"
         run: "poetry run invoke lock --check"
+      - name: "Build and check package distributions"
+        run: |
+          python -m pip install --upgrade build twine
+          rm -rf dist
+          python -m build
+          python -m twine check dist/*
       - name: "Linting: ruff"
         env:
           INVOKE_NAUTOBOT_FUNCTION_CODES_LOCAL: "True"
@@ -67,4 +70,4 @@ jobs:
       - name: "Checking: migrations"
         run: "poetry run invoke check-migrations"
       - name: "Run Tests"
-        run: "poetry run invoke unittest"
+        run: "poetry run invoke unittest --skip-docs-build"

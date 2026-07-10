@@ -12,19 +12,23 @@ keywords = ["nautobot", "nautobot-app", "nautobot-plugin"]
 classifiers = [
     "Intended Audience :: Developers",
     "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "nautobot>=3.1.7,<4.0.0",
+    "nautobot>=3.1.0,<4.0.0",
 ]
 
 [project.urls]
 Homepage = "https://www.hibulla.com"
 Repository = "https://github.com/hibulla/nautobot-function-codes"
 Documentation = "https://docs.nautobot.com/projects/function-codes/en/latest/"
+"Bug Tracker" = "https://github.com/hibulla/nautobot-function-codes/issues"
+Changelog = "https://github.com/hibulla/nautobot-function-codes/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 all = []
@@ -40,6 +44,7 @@ include = [
 
 [tool.poetry.group.dev.dependencies]
 coverage = "*"
+build = "*"
 django-debug-toolbar = "*"
 invoke = "*"
 ipython = "*"
@@ -47,6 +52,7 @@ pylint = { version = ">=4.0.6,<5.0", python = "<3.14" }
 pylint-django = { version = ">=2.6.0", python = "<3.14" }
 pylint-nautobot = { version = ">=0.4.0", python = "<3.14" }
 ruff = "0.15.20"
+twine = "*"
 yamllint = "*"
 # Python implementation of markdownlint
 pymarkdownlnt = "~0.9.30"

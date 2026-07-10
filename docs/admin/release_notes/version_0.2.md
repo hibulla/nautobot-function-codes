@@ -8,6 +8,7 @@ This document describes all new features and changes in the release `0.2`. The f
 - Coverage dashboard and synchronous CSV import from the plugin UI
 - Nautobot Jobs for assignment audit and CSV import
 - Minimum supported Python version raised to 3.12
+- Public PyPI distribution metadata and release automation documentation
 
 ## [v0.2.0] - 2026-07-05
 
@@ -30,6 +31,7 @@ This document describes all new features and changes in the release `0.2`. The f
 - Minimum supported Python version is now 3.12
 - Assignment actions now use Device Function Code Assignment change permissions instead of Function Code change permissions
 - Plugin debug logging is disabled by default
+- Package metadata now uses modern PEP 621 project metadata for PyPI publishing
 
 ### Removed
 

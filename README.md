@@ -42,6 +42,8 @@ Documentation: [docs.nautobot.com/projects/function-codes](https://docs.nautobot
 
 ## Installation
 
+Install the package from PyPI:
+
 ```bash
 pip install nautobot-function-codes
 ```
@@ -57,6 +59,8 @@ Run database migrations:
 ```bash
 nautobot-server migrate nautobot_function_codes
 ```
+
+Restart Nautobot after installing and migrating the plugin.
 
 ## Compatibility
 
@@ -80,8 +84,43 @@ Other useful commands:
 ```bash
 invoke pylint
 invoke ruff
-invoke build
+poetry run python -m build
+poetry run python -m twine check dist/*
 ```
+
+For local invoke commands that should run outside Docker, set:
+
+```bash
+export INVOKE_NAUTOBOT_FUNCTION_CODES_LOCAL=True
+```
+
+## Releasing
+
+Releases are published to PyPI automatically when a Git tag matching `v*` is pushed.
+
+1. Update the version in `pyproject.toml`, for example:
+
+   ```bash
+   poetry version patch
+   ```
+
+1. Update release notes or changelog content as needed.
+
+1. Commit the release changes:
+
+   ```bash
+   git add pyproject.toml poetry.lock CHANGELOG.md docs/admin/release_notes
+   git commit -m "Prepare release vX.Y.Z"
+   ```
+
+1. Create and push the tag:
+
+   ```bash
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+
+The `Release` GitHub Actions workflow builds the package with `python -m build`, verifies it with `twine check`, and publishes it to PyPI. If PyPI Trusted Publishing is configured for this repository and workflow, no API token is needed. Otherwise, add a repository or environment secret named `PYPI_API_TOKEN` containing a PyPI API token.
 
 ## Managing Device Assignments
 

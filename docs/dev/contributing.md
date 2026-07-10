@@ -74,4 +74,4 @@ We will create a `release-X.Y` branch for you to open your PR against and cut a 
 
 Nautobot Function Codes has currently no intended scheduled release schedule, and will release new features in minor versions.
 
-The steps taken by maintainers when creating a new release are documented in the [release checklist](./release_checklist.md).
+The steps taken by maintainers when creating a new release are documented in the [release checklist](./release_checklist.md). PyPI project setup and publishing authentication are documented in [Publishing to PyPI](./publishing.md).
