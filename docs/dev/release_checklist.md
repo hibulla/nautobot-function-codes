@@ -53,12 +53,13 @@ poetry run mkdocs build --no-directory-urls --strict
 Build and validate the source distribution and wheel:
 
 ```shell
+poetry run mkdocs build --no-directory-urls --strict
 rm -rf dist
 poetry run python -m build
 poetry run python -m twine check dist/*
 ```
 
-The wheel must include the Nautobot app package, migrations, templates, and app configuration schema.
+The wheel must include the Nautobot app package, migrations, templates, generated static documentation, and app configuration schema.
 
 ### Verify tests
 
@@ -110,6 +111,7 @@ git push origin vX.Y.Z
 The workflow will:
 
 - check that `vX.Y.Z` matches `project.version`
+- build the static documentation used by Nautobot's docs view
 - build the package with `python -m build`
 - verify the package with `twine check`
 - publish to PyPI through Trusted Publishing or `PYPI_API_TOKEN`

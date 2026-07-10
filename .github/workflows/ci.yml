@@ -29,6 +29,10 @@ jobs:
         env:
           INVOKE_NAUTOBOT_FUNCTION_CODES_LOCAL: "True"
         run: "poetry run invoke lock --check"
+      - name: "Build documentation"
+        env:
+          INVOKE_NAUTOBOT_FUNCTION_CODES_LOCAL: "True"
+        run: "poetry run invoke build-and-check-docs"
       - name: "Build and check package distributions"
         run: |
           python -m pip install --upgrade build twine

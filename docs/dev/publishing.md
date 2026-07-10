@@ -44,6 +44,7 @@ Run these commands before creating a release tag:
 
 ```shell
 poetry check --lock
+poetry run mkdocs build --no-directory-urls --strict
 rm -rf dist
 poetry run python -m build
 poetry run python -m twine check dist/*

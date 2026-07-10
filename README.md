@@ -84,6 +84,7 @@ Other useful commands:
 ```bash
 invoke pylint
 invoke ruff
+poetry run mkdocs build --no-directory-urls --strict
 poetry run python -m build
 poetry run python -m twine check dist/*
 ```
