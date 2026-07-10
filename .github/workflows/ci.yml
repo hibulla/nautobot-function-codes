@@ -25,6 +25,8 @@ jobs:
         with:
           poetry-version: "2.1.3"
           python-version: "${{ env.PYTHON_VERSION }}"
+      - name: "Install documentation dependencies"
+        run: "poetry install --with docs"
       - name: "Check poetry.lock"
         env:
           INVOKE_NAUTOBOT_FUNCTION_CODES_LOCAL: "True"
