@@ -31,13 +31,13 @@ pip install nautobot-function-codes
 For production deployments, pin the version that has been validated in your Nautobot environment:
 
 ```shell
-pip install nautobot-function-codes==0.2.0
+pip install nautobot-function-codes==0.1.0
 ```
 
 To ensure Nautobot Function Codes is automatically re-installed during future upgrades, create a file named `local_requirements.txt` (if not already existing) in the Nautobot root directory (alongside `requirements.txt`) and list the pinned package:
 
 ```shell
-echo "nautobot-function-codes==0.2.0" >> local_requirements.txt
+echo "nautobot-function-codes==0.1.0" >> local_requirements.txt
 ```
 
 Once installed, the app needs to be enabled in your Nautobot configuration. The following block of code below shows the additional configuration required to be added to your `nautobot_config.py` file:

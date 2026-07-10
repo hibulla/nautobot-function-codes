@@ -67,6 +67,6 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 ```
 
-The tag must match the version in `pyproject.toml`. For example, `version = "0.2.0"` must be released with tag `v0.2.0`.
+The tag must match the version in `pyproject.toml`. For example, `version = "0.1.0"` must be released with tag `v0.1.0`.
 
 The workflow builds the package, runs `twine check`, and publishes to PyPI. It does not publish on branch pushes, pull requests, or GitHub Release events.

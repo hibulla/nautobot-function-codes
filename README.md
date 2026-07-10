@@ -66,7 +66,7 @@ Restart Nautobot after installing and migrating the plugin.
 
 | Nautobot | Plugin | Python |
 |----------|--------|--------|
-| 3.1.x    | 0.2.x  | 3.12+  |
+| 3.1.x    | 0.1.x  | 3.12+  |
 
 ## Development
 

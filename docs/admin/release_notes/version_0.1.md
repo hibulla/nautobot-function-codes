@@ -1,6 +1,6 @@
-# v0.2 Release Notes
+# v0.1 Release Notes
 
-This document describes all new features and changes in the release `0.2`. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This document describes all new features and changes in the release `0.1`. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Release Overview
 
@@ -10,7 +10,7 @@ This document describes all new features and changes in the release `0.2`. The f
 - Minimum supported Python version raised to 3.12
 - Public PyPI distribution metadata and release automation documentation
 
-## [v0.2.0] - 2026-07-05
+## [v0.1.0] - 2026-07-05
 
 ### Added
 

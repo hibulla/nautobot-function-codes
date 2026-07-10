@@ -1,6 +1,6 @@
 [project]
 name = "nautobot-function-codes"
-version = "0.2.0"
+version = "0.1.0"
 description = "A Nautobot plugin for managing reusable Function Codes."
 authors = [
     { name = "hibulla.com", email = "contact@hibulla.com" },
@@ -183,7 +183,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.towncrier]
 package = "nautobot_function_codes"
 directory = "changes"
-filename = "docs/admin/release_notes/version_0.2.md"
+filename = "docs/admin/release_notes/version_0.1.md"
 template = "development/towncrier_template.j2"
 start_string = "<!-- towncrier release notes start -->"
 issue_format = "[#{issue}](https://github.com/hibulla/nautobot-function-codes/issues/{issue})"
