@@ -20,7 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "nautobot>=3.1.0,<4.0.0",
+    "nautobot>=3.1.8,<4.0.0",
 ]
 
 [project.urls]
@@ -51,16 +51,16 @@ ipython = "*"
 pylint = { version = ">=4.0.6,<5.0", python = "<3.14" }
 pylint-django = { version = ">=2.8.0", python = "<3.14" }
 pylint-nautobot = { version = ">=0.4.0", python = "<3.14" }
-ruff = "0.15.21"
+ruff = "0.15.22"
 twine = "*"
 yamllint = "*"
 # Python implementation of markdownlint
-pymarkdownlnt = "~0.9.30"
+pymarkdownlnt = "~0.9.39"
 Markdown = "*"
 towncrier = ">=25.8.0,<=25.8.0"
 to-json-schema = "*"
 jsonschema = "*"
-djlint = ">=1.40.4,<2.0.0"
+djlint = ">=1.40.8,<2.0.0"
 djhtml = ">=3.0.8,<4.0.0"
 
 [tool.poetry.group.docs.dependencies]
@@ -69,7 +69,7 @@ markdown-version-annotations = "1.0.1"
 # Rendering docs to HTML
 mkdocs = "1.6.1"
 # Material for MkDocs theme
-mkdocs-material = "9.7.6"
+mkdocs-material = "9.7.7"
 # Automatic documentation from sources, for MkDocs
 mkdocstrings = "1.0.6"
 mkdocstrings-python = "2.0.5"
